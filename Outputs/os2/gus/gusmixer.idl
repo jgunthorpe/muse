@@ -1,0 +1,168 @@
+/* ########################################################################
+
+   GUSMixer - Class to allow Muse/2 to output a module to a Gravis
+              UltraSound, unsing the UltiMod interface in the Manely
+              drivers.
+
+   This class should be CORBA complient. It uses the CORBA memory
+   managment philosophy which basically means that the caller must
+   allocate everything except out values and return values. The caller
+   must also free everything, including in values.
+
+   ########################################################################
+*/
+#ifndef GUSMIXER_IDL
+#define GUSMIXER_IDL
+
+#include <BaseSet\OutputBs.idl>
+
+interface museGUSMixer;
+interface museGUSMixerClass;
+
+interface museGUSMixerClass : museOutputClass
+{
+   #ifdef __SOMIDL__
+   implementation
+   {
+      majorversion = 1;                 // Major Version number
+      minorversion = 3;                 // Minor Version number
+      callstyle = oidl;                 // Use old call style
+      dllname = "Mus2GUS.dll";          // Set the dll file name
+      dtsclass;                         // DTS class
+      memory_management = CORBA;        // Caller-owns-result
+
+      // Define the compiler generated (C++ req'd) Const constructor
+      CompilerCCopyInit(museGUSMixerClass)
+      CompilerDestruct(museGUSMixerClass)
+
+      UserDefInit(museGUSMixerClass)
+
+      GetTypeName: public, override;
+      GetOptionHelp: public, override;
+      IsSupported: public, override;
+
+      octet DetectStatus;
+
+      // Each new method is listed here. New methods are added AT THE END
+      releaseorder:
+           ;
+   };
+   #endif
+};
+
+// Declare some needed private structures
+#ifdef __PRIVATE__
+   #ifdef FILE_GUSMixer
+   #pragma somemittypes on
+   #endif
+struct GUSChannelState
+{
+   boolean Enabled;
+   short Sample;
+   long Pitch;
+   long Balance;
+   long TargetB;
+   long Volume;
+   long OrgLeft;
+   long OrgRight;
+   long OrgMain;
+   short Channel1;
+   short Channel2;
+   unsigned long FreqMul;
+};
+
+struct GUSInstData
+{
+   unsigned long Flags;
+   unsigned long MemLoc;
+   unsigned long LoopBegin;
+   unsigned long LoopEnd;
+   unsigned long SampleEnd;
+	unsigned long Size;
+	unsigned long FreqMul;
+	octet Conv16to8;
+};
+
+typedef SOMFOREIGN SeqGUSChannelState;
+#pragma modifier SeqGUSChannelState:  impctx="C++", cxxdecl="typedef IDLSequence<GUSChannelState> SeqGUSChannelState;";
+
+typedef SOMFOREIGN SeqGUSInstData;
+#pragma modifier SeqGUSInstData:  impctx="C++", cxxdecl="typedef IDLSequence<GUSInstData> SeqGUSInstData;";
+
+#pragma somemittypes off
+#endif
+
+interface museGUSMixer : museOutputBase
+{
+   #ifdef __PRIVATE__
+   long OpenGUS(out string Error);
+   long CloseGUS();
+   #endif
+
+   #ifdef __SOMIDL__
+   implementation
+   {
+      majorversion = 1;                 // Major Version number
+      minorversion = 3;                 // Minor Version number
+      callstyle = oidl;                 // Use old call style
+      dllname = "Mus2GUS.dll";          // Set the dll file name
+      dtsclass;                         // DTS class
+      memory_management = CORBA;        // Caller-owns-result
+      metaclass = museGUSMixerClass;
+
+      // Define the compiler generated (C++ req'd) Const constructor
+      CompilerCCopyInit(museGUSMixer)
+
+      // Use a custom constructor/destructor
+      UserDefInit(museGUSMixer)
+      UserDestruct(museGUSMixer)
+
+      SecondsToLen: public, override;
+      LenToSeconds: public, override;
+      SetChannelMask: public, override;
+      SetVolumeScale: public, override;
+      LoadSamples: public, override;
+      Compute: public, override;
+      StopWhenDone: public, override;
+      StopNotes: public, override;
+      InitPlay: public, override;
+      StopPlay: public, override;
+      PausePlay: public, override;
+      ResumePlay: public, override;
+      TestOutput: public, override;
+
+      ForceCompError: public, override;
+      SetOptions: public, override;
+      GetCurOptionDesc: public, override;
+      Sync: public, override;
+
+      // Each new method is listed here. New methods are added AT THE END
+      releaseorder:
+         OpenGUS, CloseGUS
+         ;
+
+      // Define the private variables.
+   #ifdef __PRIVATE__
+      SeqGUSChannelState Channels;
+      SeqGUSInstData Instruments;
+      octet NumChans;
+
+      octet PlayMode;
+      unsigned long LastTime;
+      octet ChanList[33];
+      short NextChan;
+      short LastChan;
+      long TempoDiv;
+      unsigned long ComputeMutex;
+      boolean Pause;
+      unsigned long Version;
+      unsigned long CurrentTime;
+      unsigned long WaitTime;
+      unsigned long SyncSem;
+   #endif
+
+   };
+   #endif
+};
+
+#endif

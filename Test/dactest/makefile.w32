@@ -1,0 +1,17 @@
+PLATFORM = OS2
+!include ..\makedefs.w32
+
+all: $(BINDIR)\dactest.exe
+
+OBJS = dactest.obj
+LIBS = $(LIBDIR)\SOM.lib $(LIBDIR)\S3M.lib $(LIBDIR)\BaseSet.lib &
+       $(PLIBDIR)\DAC.lib $(PLIBDIR)\mmpm2.lib &
+       $(LIBDIR)\MOD.lib $(LIBDIR)\XM.lib &
+       $(LIBDIR)\IT.lib &
+       $(LIBDIR)\SimpFilt.lib $(LIBDIR)\M32Flat.lib $(LIBDIR)\DSC.lib &
+       $(LIBDIR)\Echo.lib
+
+$(BINDIR)\dactest.exe: $(OBJS) $(LIBS)
+   echo Linking $^@
+   $(LINK) /k30000 $(OBJS) $(LIBS)
+

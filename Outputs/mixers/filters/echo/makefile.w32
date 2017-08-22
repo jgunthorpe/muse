@@ -1,0 +1,18 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\Echo.lib
+
+OBJS = $(OUTDIR)\Echo.obj $(OUTDIR)\Echoa.obj
+
+$(LIBDIR)\Echo.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\Echo.obj: $(SDH)\DAC.hc $(SDH)\HandLst.hc $(SDH)\Echo.hc Echo.cpp $(SDH)\OutputBs.hc
+
+$(SDH)\Echo.hc: Echo.hc
+   $(CPHC)
+
+$(OUTDIR)\Echoa.obj: Echoa.asm Echoa.inc
+   echo Compiling Echoa.asm into $(OUTDIR)\Echoa.obj
+   tasm /oi /m2 /ml /t Echoa.asm,$(OUTDIR)\Echoa.obj
+   

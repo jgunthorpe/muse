@@ -1,0 +1,35 @@
+  Usage: muse2txt [options] module1 [module2] [@songlist1] [@songlist2] ..
+
+  Wild cards are accepted for the module names and multiple module names may
+  be given.  Also a combination of Song Lists and module names can be used,
+  any number of songs can be placed in the list and Song Lists may also
+  contain wildcards (but not other Song Lists).  They are played from first
+  on the command line to the last, in the case of wildcards they are
+  appended to the list in the order that the files reside on the disk.  If a
+  file is not found it is ignored.  After all the files have been added to
+  the song list sort/randomize options are applied.
+
+  Songs may be specified that exist inside zip files, this can be done in
+  two ways.  The first is to give the name of the zip file on the command
+  line, ie songs.zip in which case all songs contained in the zip will be
+  played.  A zip path may also be used, ie songs.zip\song.s3m will play
+  song.s3m from the zip.  A combination of wildcards is also possible,
+  *.zip\a*.s3m is valid.  Song Lists may also contain zip paths.  -- Note,
+  to use this you will have to have InfoZIP unzip (unzip.exe) in your path.
+
+  Options (case sensitive):
+ -H/h/?   Display this help screen      -V  Display Version information for
+ -O name  Choose output device,             each component
+          name is case sensitive        -P  Use a higher priority, better
+ -o"opts" Configure the output device,      for Multi-Tasking
+          see below for options for     -r  Randomize song list
+          each device.                  -R  Sort the song list
+ -S<num>  Play first num songs in the   -s  Play first song in list,
+          list, then exit. Best used        then exit. Best used with -r
+          with -r                       -l  Prevent Songs From looping (-L1)
+ -W       Writes the contents of the    -ls Loop the songlist
+          songlist to Songs.lst         -U1 New Graphic Set
+ -L0/1/2  0 = Normal, 1 = No song Loop  -U2 Original Graphics Set
+          2 = Infinite song loop, see L -B  Don't exit after last song
+          Key                           -T  Realtime Playback
+                                        -v# Default Volume, 0->64

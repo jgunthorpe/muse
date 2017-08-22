@@ -1,0 +1,16 @@
+#!/usr/bin/make -sf
+# -*- make -*-
+
+# Define the library name
+LIBRARY = s3m
+
+# The header files we want copied
+HEADERS = s3mform.h
+
+# The source files that make the lib
+SOURCE = s3mform.cpp s3mplay.cpp
+
+# This does the rest automagically!
+REL = ..
+include $(REL)/makedefs.gmk
+	

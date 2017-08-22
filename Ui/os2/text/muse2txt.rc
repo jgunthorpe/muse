@@ -1,0 +1,122 @@
+// Main Background screen
+resource 1 101 OrgDisp\Screen.bin
+rcdata 101
+begin
+   9L,23L,21L,         // Output device name
+   5L,0L,46L,          // File name
+   1L,24L,15L,         // Mode
+   52L,0L,27L,         // File Type
+   70L,23L,10L,        // Time
+   -70L,23L,10L,       // Volume
+   1L,22L,             // Pane Start Pane Height (Lines)
+   0L,                 // 1 = HMS not : in time
+   -12L,1L,68L,         // File location path
+end
+
+// Statistics screen
+resource 1 102 OrgDisp\Stats.bin
+rcdata 102
+begin
+   12L,2L,36L,         // Stats File Name
+   12L,3L,36L,         // Stats File Type
+   12L,4L,36L,         // Stats File Type 2
+   12L,5L,36L,         // Stats Title
+   70L,2L,10L,         // Stats NumPats
+   70L,3L,10L,         // Stats NumOrds
+   70L,4L,10L,         // Stats Rows Per Pat
+   70L,5L,10L,         // Num Chans
+   8L,                 // Comments row
+end
+
+// Instruments screen
+resource 1 103 OrgDisp\Inst.bin
+rcdata 103
+begin
+   0L,0L,44L,             // Inst name
+   45L,0L,6L,             // Inst Size
+   52L,0L,6L,             // Inst Start
+   59L,0L,6L,             // Inst End
+   66L,0L,3L,             // Inst Bits
+   70L,0L,3L,             // Inst Vol
+   74L,0L,6L,             // Inst Centre
+   0L,                    // Have a bottom bit
+end
+
+resource 1 104 OrgDisp\Anvil.bin
+resource 1 105 OrgDisp\Help.bin
+rcdata 105
+begin
+   0L,80L                 // Start line, size
+   0L,                    // Have a bottom bit
+end
+resource 1 99  Usage.txt
+
+// Main Background screen
+resource 1 201 WizDisp\Screen6.bin
+rcdata 201
+begin
+   148L,19L,10L,       // Output device name
+   12L,0L,39L          // File name
+   112L,19L,14L,       // Mode
+   52L,0L,27L          // File Type
+   32L,19L,8L,         // Time
+   10L,22L,51L,        // Volume
+   2L,15L,             // Pane Start Pane Height (Lines)
+   1L,                 // 1 = HMS not : in time
+   12L,1L,67L,         // File location path
+end
+
+// Statistics screen
+resource 1 202 WizDisp\Stats.bin
+rcdata 202
+begin
+   -4L,2L,32L,         // Stats File Name
+   4L,2L,32L,          // Stats File Type
+   4L,3L,28L,          // Stats File Type 2
+   139L,1L,39L,        // Stats Title
+   121L,5L,8L,         // Stats NumOrds
+   121L,4L,8L,         // Num Chans
+   38L,4L,40L,         // Comment top row
+   121L,7L,8L,         // Loop State
+   121L,8L,8L,         // Pitch
+   121L,9L,8L,         // Speed
+   10L,                // Num comments rows
+   5L,                 // Comments blank line
+   11L,11L,18L,         // Pan Depth
+   11L,12L,18L,         // Pan Balance
+   11L,13L,18L,         // Pan Center
+end
+
+// Instruments screen
+resource 1 203 WizDisp\Inst5.bin
+rcdata 203
+begin
+   2L,0L,46L,             // Inst name
+   48L,0L,6L,             // Inst Size
+   54L,0L,6L,             // Inst Start
+   60L,0L,6L,             // Inst End
+   66L,0L,2L,             // Inst Bits
+   69L,0L,2L,             // Inst Vol
+   72L,0L,6L,             // Inst Centre
+   1L,                    // Have a bottom bit
+end
+
+resource 1 205 WizDisp\Help4.bin
+rcdata 205
+begin
+   2L,76L                 // Start line, size
+   1L,                    // Have a bottom bit
+end
+
+resource 1 206 WizDisp\DAC.bin
+rcdata 206
+begin
+   164L,2L,7L,            // % Scale
+   2L,3L,7L,              // Filter dots
+   3L,31L,5L,             // Scale dots
+   164L,3L,7L,            // Ideal Scale
+   164L,4L,7L,            // Lowest Scale
+   164L,5L,7L,            // Amp Factor
+end
+
+defaulticon Muse2.ico

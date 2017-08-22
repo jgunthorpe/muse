@@ -1,0 +1,92 @@
+!include "..\makedefs.som"
+
+CFLAGS = $(COPTSOMTHREADDLL)
+LFLAGS = $(LOPTSOMTHREADDLL)
+LIBS = -lhcc.lib -lhc.lib
+
+ALLHH = $(SHD)\OutputBs.hh $(SHD)\FormatBs.hh $(SHD)\DAC.hh $(SHD)\HandLst.hh \
+       $(SHD)\EFXFiltr.hh $(SHD)\TimeBuf.hh
+
+ALLXH = $(SHD)\OutputBs.xh $(SHD)\FormatBs.xh $(SHD)\DAC.xh $(SHD)\HandLst.xh \
+       $(SHD)\EFXFiltr.xh $(SHD)\TimeBuf.xh
+
+all: $(ALLHH) \
+     $(SHD)\Muse.h $(SHD)\Thread.h $(SHD)\MinMax.h $(SHD)\Flags.h \
+     $(BINDIR)\Mus2Base.dll $(ALLXH)
+
+OBJS = $(OUTDIR)\FormatBs.obj \
+    $(OUTDIR)\OutputBs.obj $(OUTDIR)\MixerCom.obj $(OUTDIR)\Mixer.obj \
+    $(OUTDIR)\Mix.obj $(OUTDIR)\Filter.obj $(OUTDIR)\HandLst.obj \
+    $(OUTDIR)\EFXFiltr.obj $(OUTDIR)\TimeBuf.obj
+
+$(BINDIR)\Mus2Base.dll: $(OBJS)
+   echo Linking $@
+   $(LINK) $(LDDEF)SOM\BaseSet.def $(OBJS) $(LINKEND)
+   echo Implib
+   implib /nologo $(LIBBASE)\$(@B).lib $@
+   implib /nologo $(LIBBASE)\I$(@B).lib SOM\IBaseSet.Def
+
+$(OUTDIR)\FormatBs.obj: $(SHD)\FormatBs.hh FormatBs.cpp
+
+$(OUTDIR)\OutputBs.obj: $(SHD)\OutputBs.hh OutputBs.cpp
+
+$(OUTDIR)\HandLst.obj: $(SHD)\HandLst.hh HandLst.cpp
+
+$(OUTDIR)\MixerCom.obj: $(SHD)\DAC.hh MixerCom.cpp
+
+$(OUTDIR)\TimeBuf.obj: $(SHD)\TimeBuf.hh TimeBuf.cpp
+
+$(OUTDIR)\EFXFiltr.obj: $(SHD)\EFXFiltr.hh EFXFiltr.cpp
+
+$(SHD)\FormatBs.hh: FormatBs.idl
+
+$(SHD)\OutputBs.hh: OutputBs.idl
+
+$(SHD)\HandLst.hh: HandLst.idl
+
+$(SHD)\EFXFilter.hh: EFXFilter.idl
+
+$(SHD)\DAC.hh: DAC.idl
+
+$(SHD)\TimeBuf.hh: TimeBuf.idl
+
+$(SHD)\FormatBs.xh: FormatBs.idl
+
+$(SHD)\OutputBs.xh: OutputBs.idl
+
+$(SHD)\HandLst.xh: HandLst.idl
+
+$(SHD)\DAC.xh: DAC.idl
+
+$(SHD)\TimeBuf.xh: TimeBuf.idl
+
+$(SHD)\EFXFilter.xh: EFXFilter.idl
+
+$(SHD)\Flags.h: Flags.h
+   copy $** $@ > nul
+
+$(SHD)\Muse.h: Muse.h
+   copy $** $@ > nul
+
+$(SHD)\Thread.h: Thread.h
+   copy $** $@ > nul
+
+$(SHD)\MinMax.h: MinMax.h
+   copy $** $@ > nul
+
+$(OUTDIR)\Mixer.obj: Mixer.cpp
+   echo Compiling Mixer.cpp into $(@D)
+   $(CC) Mixer.cpp -Hobjdir=$(@D) -586 -Hpragma=pack(4)
+
+$(OUTDIR)\Filter.obj: Filter.cpp
+   echo Compiling Filter.cpp into $(@D)
+   $(CC) Filter.cpp -Hobjdir=$(@D) -586 -Hpragma=pack(4)
+
+$(OUTDIR)\Mix.obj: Mix.asm
+   echo Compiling Mix.asm into $(@D)
+   tasm /oi /m2 /ml Mix.asm,$(OUTDIR)\Mix.obj
+
+$(OUTDIR)\Mix2.obj: Mix2.asm
+   echo Compiling Mix2.asm into $(@D)
+   tasm /oi /m2 /ml Mix2.asm,$(OUTDIR)\Mix2.obj
+

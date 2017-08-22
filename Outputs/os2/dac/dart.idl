@@ -1,0 +1,145 @@
+/* ########################################################################
+
+   DACDART - Class to allow Muse/2 to output a module to a MMPM/2 DAC
+             using DART
+
+   This class supports a range of output formats from 8KHz Mono 8Bit to
+   44KHz stero 16 bit with both 16 and 8 bit samples. The module handler
+   calls Calc each cycle (called a frame in S3M's) which will mix that short
+   period into the output buffer.
+
+   This class should be CORBA complient. It uses the CORBA memory
+   managment philosophy which basically means that the caller must
+   allocate everything except out values and return values. The caller
+   must also free everything, including in values.
+
+   ########################################################################
+*/
+#ifndef DART_IDL
+#define DART_IDL
+
+#include <BaseSet\DAC.idl>
+
+interface museDACDART;
+interface museDACDARTClass;
+
+interface museDACDARTClass : museDACMixerClass
+{
+   #ifdef __SOMIDL__
+   implementation
+   {
+      majorversion = 1;                 // Major Version number
+      minorversion = 5;                 // Minor Version number
+      callstyle = oidl;                 // Use old call style
+      dllname = "Mus2DAC.dll";          // Set the dll file name
+      dtsclass;                         // DTS class
+      memory_management = CORBA;        // Caller-owns-result
+
+      // Define the compiler generated (C++ req'd) Const constructor
+      CompilerCCopyInit(museDACDARTClass)
+      CompilerDestruct(museDACDARTClass)
+      UserDefInit(museDACDARTClass)
+
+      GetTypeName: public, override;
+      IsSupported: public, override;
+
+      // Each new method is listed here. New methods are added AT THE END
+      releaseorder:
+           ;
+   };
+   #endif
+};
+
+// Declare some needed private structures
+#ifdef __PRIVATE__
+#pragma somemittypes on
+    typedef SOMFOREIGN MCI_MIX_BUFFER;
+    #pragma modifier MCI_MIX_BUFFER:  impctx="C++", cxxdecl="typedef struct _MCI_MIX_BUFFER MCI_MIX_BUFFER;";
+    typedef SOMFOREIGN MCI_MIXSETUP_PARMS;
+    #pragma modifier MCI_MIXSETUP_PARMS:  impctx="C++", cxxdecl="typedef struct _MCI_MIXSETUP_PARMS MCI_MIXSETUP_PARMS;";
+#pragma somemittypes off
+#endif
+
+interface museDACDART : museDACMixer
+{
+   #ifdef __PRIVATE__
+   long OpenMMPM(out string Error);
+   long CloseMMPM();
+   long EventHandler(in unsigned long Status, inout MCI_MIX_BUFFER Buffer,in unsigned long Flags);
+   #endif
+
+   attribute unsigned short MaxBufferLen;
+   attribute float TotalBufferTime;
+
+   #ifdef __SOMIDL__
+   implementation
+   {
+      majorversion = 1;                 // Major Version number
+      minorversion = 5;                 // Minor Version number
+      callstyle = oidl;                 // Use old call style
+      dllname = "Mus2DAC.dll";          // Set the dll file name
+      dtsclass;                         // DTS class
+      memory_management = CORBA;        // Caller-owns-result
+      metaclass = museDACDARTClass;    // Define our meta class
+
+      // Define the compiler generated (C++ req'd) Const constructor
+      CompilerCCopyInit(museDACDART)
+
+      // Use a custom constructor/destructor
+      UserDefInit(museDACDART)
+      UserDestruct(museDACDART)
+
+      InitPlay: public, override;
+      StopPlay: public, override;
+      PausePlay: public, override;
+      ResumePlay: public, override;
+      TestOutput: public, override;
+      GetNextBuffer: public, override;
+      StopWhenDone: public, override;
+      SetMixParams: public, override;
+      Sync: public, override;
+
+      // Each new method is listed here. New methods are added AT THE END
+      releaseorder:
+         OpenMMPM,
+         CloseMMPM,
+         EventHandler,
+         _get_MaxBufferLen,_set_MaxBufferLen,
+         _get_TotalBufferTime,_set_TotalBufferTime
+         ;
+
+      // Define the private variables.
+   #ifdef __PRIVATE__
+      unsigned long WaitTime;
+      unsigned long SyncSem;
+
+      unsigned long BlockSize;
+      unsigned long NumBuffers;
+      unsigned long CurBuffer;
+      unsigned long CurPlayBuffer;
+      unsigned long CurOutBuffer;
+      unsigned long Silence;
+      boolean Opened;
+      octet Playing;
+
+      unsigned long LastCount;
+      unsigned long BlockSem;
+      unsigned long DoneSem;
+
+      unsigned long SamplingRate;
+      octet Bits;
+      boolean Stereo;
+      boolean Paused;
+
+      unsigned long DeviceId;
+
+      MCI_MIX_BUFFER *Buffers;
+      MCI_MIXSETUP_PARMS *Setup;
+      boolean DetectSRate;
+   #endif
+
+   };
+   #endif
+};
+
+#endif

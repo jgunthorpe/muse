@@ -1,0 +1,13 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\DSC.lib
+
+OBJS = $(OUTDIR)\DSC.obj
+
+$(LIBDIR)\DSC.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\DSC.obj: $(SDH)\DAC.hc $(SDH)\HandLst.hc $(SDH)\DSC.hc DSC.cpp $(SDH)\OutputBs.hc
+
+$(SDH)\DSC.hc: DSC.hc
+   $(CPHC)

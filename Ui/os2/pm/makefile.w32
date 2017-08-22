@@ -1,0 +1,21 @@
+PLATFORM = OS2
+!include ..\..\..\makedefs.w32
+
+all: $(BINDIR)\MusePM.exe
+
+OBJS = $(OUTDIR)\MusePM.obj $(OUTDIR)\SngList.obj $(OUTDIR)\SngTypes.obj &
+       $(OUTDIR)\StrTable.obj $(OUTDIR)\Zip.obj $(OUTDIR)\ListBoxes.obj
+
+LIBS = $(LIBDIR)\SOM.lib
+
+#       $(LIBDIR)\S3M.lib $(LIBDIR)\BaseSet.lib
+#       $(LIBDIR)\File.lib $(PLIBDIR)\DAC.lib $(PLIBDIR)\mmpm2.lib
+#       $(PLIBDIR)\GUSMixer.lib $(LIBDIR)\MOD.lib $(LIBDIR)\XM.lib $(LIBDIR)\IT.lib
+
+$(BINDIR)\MusePM.exe: $(OBJS) $(LIBS) MusePM.res
+   echo Linking $^@
+   $(LINK) /k30000 /l=os2v2_pm $(OBJS) $(LIBS)
+   rc MusePM.res $(BINDIR)\MusePM.exe
+
+MusePM.res: MusePM.rc MusePM.rh
+   rc -r MusePM.rc MusePM.res

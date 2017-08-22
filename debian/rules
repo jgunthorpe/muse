@@ -1,0 +1,72 @@
+#!/usr/bin/make -sf
+# debian/rules file for muse
+
+# Version.
+package = muse
+
+arch = $(shell dpkg --print-architecture)
+tmp = debian/tmp
+
+PROGS = binl/muse
+UTILS =
+
+# Install flags
+INSTALL      = /usr/bin/install -c
+INSTALL_BIN  = ${INSTALL} -m 755 -s
+INSTALL_FILE = ${INSTALL} -m 644
+
+# Check for the correct directory, muse's root
+define checkdir
+	test -f makedefs.gmk
+endef
+
+.PHONY: build binary binary-arch binary-indep clean checkroot
+
+# Build the binaries, the main makefile does this for us.
+build:
+	$(checkdir)
+	echo Building Program
+	./makefile.gmk binary
+
+# Architecture independant files. Muse has none
+binary-indep: build
+	$(checkdir)
+
+# Make a binary package (.deb file)
+binary-arch: build checkroot
+	-rm -rf $(tmp)
+	
+	echo Making Directories
+	mkdir -p $(tmp)/DEBIAN $(tmp)/usr/bin $(tmp)/usr/doc/muse
+	chmod 755 $(tmp)/DEBIAN
+
+	echo Placing Files
+	$(INSTALL_BIN) binl/muse $(tmp)/usr/bin
+	$(INSTALL_FILE) muse.txt $(tmp)/usr/doc/muse/README.txt
+	$(INSTALL_FILE) copyright $(tmp)/usr/doc/muse/copyright
+	$(INSTALL_FILE) history.txt $(tmp)/usr/doc/muse/changelog
+	cp debian/changelog $(tmp)/usr/doc/muse/changelog.Debian
+	
+	echo Compressing Docs
+	gzip $(tmp)/usr/doc/muse/README.txt $(tmp)/usr/doc/muse/changelog
+	gzip $(tmp)/usr/doc/muse/changelog.Debian
+
+	echo Building .deb file in ..
+	dpkg-shlibdeps binl/muse
+	dpkg-gencontrol
+	dpkg --build $(tmp) ..
+	rm -rf $(tmp)
+
+# Clean up. Why do we have this? Is it supposed to do a make veryclean on the
+# main source?
+clean:	checkroot
+	rm -rf $(tmp)
+
+binary:	binary-indep binary-arch
+
+checkroot:
+	$(checkdir)
+	test root = "`whoami`"
+
+dist:	binary
+	dpkg-source -b

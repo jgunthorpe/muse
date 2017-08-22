@@ -1,0 +1,970 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Hannu Savolainen">
+   <TITLE>Open Sound System - Audio programming</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#FF0000" ALINK="#FFFF00">
+
+
+<TABLE BORDER WIDTH="100%" >
+<TR>
+<TD><IMG SRC="../gifs/logo.gif" HSPACE=5 VSPACE=5 HEIGHT=45 WIDTH=121>&nbsp;
+</TD>
+
+<TD>
+<CENTER>
+<H1>
+<FONT COLOR="#FF0000"><FONT SIZE=+3>Audio Programming</FONT></FONT>&nbsp;</H1></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<H2>
+<FONT COLOR="#FF0000">Notice!</FONT></H2>
+<FONT COLOR="#FF0000">There is a hidden pointer somewhere in this text
+to a page containing deeper information about using audio. You should have<B>
+perfect</B> understanding about the features described in this page before
+jumping into more complicated information. Just make sure you read this
+text carefully enough so you will be able to find the link.</FONT>&nbsp;
+
+<TABLE CELLPADDING=10 >
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3><A NAME="intro"></A>Introduction</H3>
+</TD>
+
+<TD>Digital audio is the most commonly used method to represent sound inside
+a computer. In this method sound is stored as a sequence of samples taken
+from the audio signal using constant time intervals. A <I>sample </I>represents
+volume of the signal at the moment when it was measured. In uncompressed
+digital audio each sample require one or more bytes of storage. Number
+of bytes required depends on <I>number of channels</I> (mono, stereo) and
+<I>sample format</I> (8 or 16 bits, mu-Law, etc.). The length of this interval
+determines the <I>sampling rate</I>. Normally used sampling rates are between
+8 kHz (telephone quality) and 48 kHz (DAT tapes).&nbsp;
+<BR>
+<BR>The physical devices used in digital audio are called ADC (<I>Analog to
+Digital Converter</I>) and DAC (D<I>igital to Analog Converter</I>). A
+device containing both ADC and DAC is commonly known as <I>codec</I>. The
+codec device used in Sound Blaster cards is called DSP which is somehow
+misleading since DSP also stands for <I>Digital Signal Processor</I> (the
+SB DSP chip is very limited when compared to &quot;true&quot; DSP chips).&nbsp;
+<BR>
+<BR>Sampling parameters affect quality of sound which can be reproduced from
+the recorded signal. The most fundamental parameter is sampling rate which
+limits the highest frequency than can be stored. It is well known (Nyquist's
+Sampling Theorem) that the highest frequency that can be stored in sampled
+signal is at most 1/2 of the sampling frequency. For example 8 kHz sampling
+rate permits recording of signal in which the highest frequency is less
+than 4 kHz. Higher frequency signals must be filtered out before feeding
+them to DAC.&nbsp;
+<BR>
+<BR>Sample encoding limits dynamic range of recorded signal (difference between
+the faintest and the loudest signal that can be recorded). <B>In theory</B>
+the maximum dynamic range of signal is number_of_bits * 6 dB . This means
+that 8 bits sampling resolution gives dynamic range of 48 dB and 16 bit
+resolution gives 96 dB.&nbsp;
+<BR>
+<BR>Quality has price. Number of bytes required to store an audio sequence
+depends on sampling rate, number of channels and sampling resolution. For
+example just 8000 bytes of memory is required to store one second of sound
+using 8 kHz/8 bits/mono but 48 kHz/16bit/stereo takes 192 kilobytes. A
+64 kbps ISDN channel is required to transfer a 8kHz/8bit/mono audio stream
+and about 1.5 Mbps is required for DAT quality (48kHz/16bit/stereo). On
+the other hand it is possible to store just 5.46 seconds of sound to a megabyte
+of memory when using 48kHz/16bit/stereo sampling. With 8kHz/8bits/mono
+it is possible to store 131 seconds of sound using the same amount of memory.
+It is possible to reduce memory and communication costs by compressing the
+recorded signal but this is out of the scope of this document.&nbsp;
+<BR>
+<BR>OSS has three kind of device files for audio programming. The only difference
+between these device files is the default sample encoding used after opening
+the device. <TT>/dev/dsp</TT> uses 8 bit unsigned encoding while <TT>/dev/dspW</TT>
+uses 16 bit signed <B>little endian</B> (Intel) encoding and <TT>/dev/audio</TT>
+uses logarithmic mu-Law encoding. There are no other differences between
+the devices. All of them work in 8 kHz mono mode after opening them. It is
+possible to change sample encoding by using the ioctl interface after which
+all of these device files behave in similar way. However it is recommended
+that the device file is selected based on the encoding to be used. This
+gives the user more possibilities in establishing symbolic links for these
+devices.&nbsp;
+<BR>
+<BR>In short it is possible to record from these devices using the normal <TT>open()</TT>,
+<TT>close()</TT>, <TT>read()</TT> and <TT>write()</TT> system calls. Default
+parameters of the device files (see above) has been selected so that it is
+possible to record and play back speech and other signals with relatively
+low quality requirements. It is possible to change many parameters of the
+devices by calling the <TT>ioctl()</TT> functions defined below. All codec
+devices have capability to record or playback audio. However there are
+devices which don't have recording capability at all. Most audio devices
+have the capability of working in <I>half duplex</I> mode which means that
+they can record and playback but not at the same time. Devices having simultaneous
+recording and playback capability are called <I>full duplex</I> devices.&nbsp;
+<BR>
+<BR>The simplest way to record audio data is to use normal UNIX commands such
+as <TT>cat</TT> or <TT>dd</TT>. For example <TT>cat /dev/dsp &gt; xyz</TT>
+records data from the audio device to a disk file called <TT>xyz</TT> until
+the command is killed (<TT>ctrl-C</TT>). Command <TT>cat xyz &gt; /dev/dsp</TT>
+can be used to play back the recorded sound file. (Note that you may need
+to change recording source and level using a mixer program before recording
+to disk works properly).&nbsp;
+<BR>
+<BR>Audio devices are always opened exclusively. If another program tries to
+open the device when it is already open, the driver returns immediately
+an error (<TT>EBUSY</TT>).&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3><A NAME="guidelines"></A>General programming guidelines</H3>
+</TD>
+
+<TD>It is highly recommended that you carefully read the the following notes
+and also the programming guidelines chapter of <A HREF="intro.html">the
+introduction page</A>. These notes are likely to prevent you from making
+the most common mistakes with OSS API. <B>At least you should read them
+if you have problems in getting your program to work.</B>&nbsp;
+<BR>
+<BR>The following is a list of things that must be taken in account before
+starting programming digital audio. Features referred in these notes will
+be explained in detail later in this document.&nbsp;
+
+<UL>
+<LI>
+Avoid extra features and tricks. They don't necessarily make your program
+better but may make it incompatible with some (future) devices.</LI>
+
+<LI>
+Open the device files using <TT>O_RDONLY</TT> or <TT>O_WRONLY</TT>
+flags whenever it is possible. The driver uses this information when making
+many optimizing decisions. Use <TT>O_RDWR</TT> <B>only</B> when writing
+a program which is going to <B>both</B> record and play back digital audio.
+Even in this case try to find if it is possible to close and reopen the
+device when switching between recording and playback.</LI>
+
+<LI>
+Beware of little and big endian encoding of 16 bit data. This is not
+a problem when using 8 bit data or normal 16 bit sound cards in little
+endian (Intel) machines. However endianess is likely to cause problems
+in big endian machines (68k, PowerPC, Sparc, etc.). You should not try
+to access 16 bit samples blindly as <TT>signed short</TT>.</LI>
+
+<LI>
+Default recording source and recording level is undefined when a audio
+device is opened. You should inform the user about this and to instruct
+him/her to use a mixer program to change these settings. It is possible
+to include <A HREF="mixer.html">mixer features</A> to a program using digital
+audio. However it is not recommended since it is likely to make your program
+more hardware dependent (mixers are different and not always present).</LI>
+
+<LI>
+Explicitly set all parameters your program depends on. There are default
+values for all parameters but it is possible that some (future) devices
+may not support them. For example the default sampling speed (8 kHz) or
+sampling resolution (8 bits) may not be supported by some high end professional
+devices.</LI>
+
+<LI>
+Always check if an error (-1) is returned form a system call such as
+<TT>ioctl()</TT>. This indicates that the driver was not able to execute
+the request made by your program.</LI>
+
+<LI>
+In most cases <TT>ioctl()</TT> modifies the value passed in as an argument.
+It is important to check this value since it indicates value that was actually
+accepted by the device. For example if the program requests higher sampling
+rate than supported by the device, the driver uses automatically the highest
+possible speed. The actually used value is the returned as the new value
+of the argument. As well the device may not support all possible sampling
+rates but just few of them. In this case the driver uses the supported
+sampling rate that is closest to the requested one.</LI>
+
+<LI>
+<B>Set sampling parameters always so that number of channels (mono/stereo)
+is set before selecting sampling rate (speed). Failing to do this will
+make your program incompatible with SB Pro (44.1 kHz speed in mono but
+just 22.05 kHz in stereo). Program which selects 44.1 kHz speed and then
+sets the device to stereo mode will incorrectly believe that the device
+is still in 44.1 kHz mode (actually the speed is decreased to 22.05 kHz).</B></LI>
+
+<LI>
+Don't use older programs as an example before checking that it doesn't
+break these rules and that it actually works. Many oldest programs were
+made for early prototype versions of the driver and they are not compatible
+with later driver versions (2.0 or later).</LI>
+
+<LI>
+Avoid writing programs which work only in 16 bit mode since some audio
+devices don't support other than 8 bit mode. It is relatively easy to write
+programs so that they are capable to output both in 8 and 16 bit modes.
+This makes the program usable for other than 16 bit sound card owners.
+<B>At least you should check that the device supports 16 bit mode before
+trying to output 16 bit data to it.</B> 16 bit data played in 8 bit mode
+(and vice versa) is just annoying loud noise.</LI>
+
+<LI>
+Don't try to use full duplex audio before checking that the device
+actually supports full duplex mode.</LI>
+
+<LI>
+Always read and write full samples. For example in 16bit/stereo mode
+each sample is 4 bytes long (two 16 bit sub-samples). In this case the
+program must read and write always N*4 bytes (N is integer). Failing to
+do so will cause lost sync between the program and the device sooner or
+later. In this case the output/input will be just noise or left and right
+channels will be swapped together.</LI>
+
+<LI>
+Avoid writing programs which keep audio devices open when they are
+not required. This prevents other programs from using the device. Implement
+interactive programs so that the device is opened only when user activates
+recording and/or playback or when the program needs to validate sampling
+parameters (in this case it should handle <TT>EBUSY</TT> situations intelligently).
+However the device can be kept open when it is necessary to prevent other
+programs from accessing the device.</LI>
+
+<LI>
+Always view all error codes returned by system calls to the driver.
+This can be done using <TT>perror()</TT>, <TT>strerror()</TT> or some other
+standard method which interprets the error code returned in <TT>errno</TT>.
+Omitting this information may make it impossible to solve problems with
+your program.</LI>
+</UL>
+
+<HR width=100%>
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>Simple audio</H3>
+</TD>
+
+<TD>For simplicity recording and playback will be described separately.
+It is possible to write programs which both record and play back audio data
+but writing this kind of applications is not simple. They will be covered
+in the later sections.&nbsp;
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> <A NAME="declarations"></A>Declarations for an audio program</H3>
+</TD>
+
+<TD>In general all programs using OSS API should include <TT><A HREF="sndcrd.html">soundcard.</A>h</TT>
+which is a C language header file containing definitions for the API. The
+other header files to be included are <TT>ioctl.h</TT>, <TT>unistd.h</TT>
+and <TT>fcntl.h.</TT> Other mandatory declarations for an audio application
+are <I>file descriptor</I> for the device file and a <I>program buffer</I>
+which is used to store the audio data during processing by the program.
+The following is an example of declarations for a simple audio program:&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD>
+<PRE>/*&nbsp;
+&nbsp;* Standard includes
+&nbsp;*/
+
+#include &lt;ioctl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;sys/soundcard.h&gt;
+
+/*
+&nbsp;* Mandatory variables.
+&nbsp;*/</PRE>
+
+<PRE>#define BUF_SIZE&nbsp;&nbsp;&nbsp; 4096</PRE>
+
+<UL>int audio_fd;&nbsp;
+<BR>unsigned char audio_buffer[BUF_SIZE];&nbsp;
+</UL>
+</TD>
+</TR>
+</TABLE>
+In the above the <TT>BUF_SIZE</TT> macro is used to define size of buffer
+allocated for audio data. It is possible to reduce system call overhead
+by passing more data in eact <TT>read()</TT> and <TT>write()</TT> call.
+However shorter buffers give better results when recording. Effect of buffer
+size will be covered in detail in the &quot;Improving real time performance&quot;
+section. Buffer sizes between 1024 and 4096 are good choices for normal
+use.&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> <A NAME="opening"></A>Selecting and opening the device</H3>
+</TD>
+
+<TD>An audio device must be opened before it can be used (obvious). As
+mentioned earlier, there are three possible device files which differe
+only in the default sample encoding they use (<TT>/dev/dsp</TT>=8 bit unsigned,
+<TT>/dev/dspW</TT>=16 bit signed little endian and <TT>/dev/audio</TT>=mu-Law).
+It is important to open the right device if the program doesn't set the
+encoding explicitly.&nbsp;
+<BR>
+<BR>The device files mentioned above are actually just symbolic links to the
+actual device files. For example <TT>/dev/dsp</TT> points normally to <TT>/dev/dsp0</TT>
+which is the first audio device detected on the system. User has freedom
+to set the symbolic links to point to other devices if it gives better
+results. It is good practice to use always the symbolic link (<TT>/dev/dsp</TT>)
+and not the actual device (<TT>/dev/dsp0</TT>). Programs should access
+the actual device files only if the device name is made easily configurable.&nbsp;
+<BR>
+<BR>It is recommended that the device file is opened in read only (<TT>O_RDONLY</TT>)
+or write only (<TT>O_WRONLY</TT>) mode. Read write mode (<TT>O_RDWR</TT>)
+should be used only when it is necessary to record and play back at the
+same time (duplex mode).&nbsp;
+<BR>
+<BR>The following code fragment can be used to to open the selected device
+(<TT>DEVICE_NAME</TT>). <I><TT>open_mode</TT></I> should be <TT>O_WRONLY</TT>,
+<TT>O_RDONLY</TT> or <TT>O_RDWR</TT>. Other flags are undefined and must
+not be used with audio devices.&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD><I>i</I><TT>f ((audio_fd = open(DEVICE_NAME, open_mode, 0)) == -1)</TT>&nbsp;
+<BR><TT>{ /* Opening device failed */</TT>&nbsp;
+<BR><TT>perror(DEVICE_NAME);</TT>&nbsp;
+<BR><TT>exit(Error code);</TT>&nbsp;
+<BR><TT>}</TT>&nbsp;
+</TD>
+</TR>
+</TABLE>
+It is recommended that programs display the error message returned by open
+using standard methods such as <TT>perror()</TT> or <TT>strerror()</TT>.
+This information is likely to be very important to the user or support
+personnell trying to guess why the device cannot be opened. There is no
+need to handle various error messages differently. Only <TT>EBUSY</TT>
+(Device busy) can be handled by the program by trying to open the device
+again after some time (it is not guaranteed the the device ever becomes
+available).&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> <A NAME="simple_application"></A>Simple recording application</H3>
+</TD>
+
+<TD>Writing an application which reads from an audio device is very easy
+as long as recording speed is relatively low, the program doesn't perform
+time consuming computations and when there are no strict real time response
+requirements. Solutions to this kind of problem will be presented later
+in this document. All the program needs to do is to read data from the
+device and to process or store it in some way. The following code fragment
+can be used to read data from the device:&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD><TT>int len;</TT>&nbsp;
+<BR>
+<BR><TT>if ((len = read(audio_fd, audio_buffer, <I>count</I>)) == -1)</TT>&nbsp;
+<BR><TT>{</TT>&nbsp;
+<BR><TT>perror(&quot;audio read&quot;);</TT>&nbsp;
+<BR><TT>exit(<I>Error code</I>);</TT>&nbsp;
+<BR><TT>}</TT>&nbsp;
+</TD>
+</TR>
+</TABLE>
+In the above example the <TT>count</TT> is number of bytes the program
+wants to read from the device. It must be less or equal than size of <TT>audio_buffer</TT>
+(obvious). In addition it must always be an integer multiple of sample
+size. Using an an integer power of 2 (4, 8, 16, 32, 64, 128, 256, 512,
+...) is recommended since it works best with internal buffering used by
+the driver.&nbsp;
+<BR>
+<BR>Number of bytes recorded from the device can be used to measure time precisely.
+Audio <I>data rate</I> (bytes per second) depends on sampling speed, sample
+size and number of channels. For example when using 8 kHz/16bits/stereo
+sampling the data rate is 8000*2*2 = 32000 bytes/second. This is actually
+the only way to know when to stop recording. It is important to notice that
+there is no <I>end of file</I> condition defined for audio devices.&nbsp;
+<BR>
+<BR>Error returned by <TT>read()</TT> usually means that there is a (permanent)
+hardware error or that the program has tried to do something which is not
+possible. It is not possible to recover from errors by trying again (closing
+and reopening the device may help in some cases).&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> Simple playback application</H3>
+</TD>
+
+<TD>A simple playback program works exactly like a recording program. The
+only difference is that a playback program calls <TT>write()</TT>.&nbsp;
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> Setting sampling parameters</H3>
+</TD>
+
+<TD>There are three parameters which affect quality (and memory/bandwidth
+requirements) of sampled audio data. These parameters are the following:&nbsp;
+
+<UL>
+<LI>
+<A HREF="audio.html#sample_format">Sample format</A> (sometimes called
+as number of bits)</LI>
+
+<LI>
+<A HREF="audio.html#channels">Number of channels</A> (mono/stereo)</LI>
+
+<LI>
+<A HREF="audio.html#speed">Sampling rate</A> (speed)</LI>
+</UL>
+
+
+<TABLE BORDER >
+<TR>
+<TD><B><FONT COLOR="#FF0000">NOTE<BLINK>!</BLINK></FONT></B>&nbsp;
+<BR><B><FONT COLOR="#FF0000">It is important to set these parameters always
+in the above order. Setting speed before number of channels doesn't work
+with all devices.</FONT></B>&nbsp;
+<BR>
+<BR><B><FONT COLOR="#FF0000">It is possible to change sampling parameters only
+between <TT>open()</TT> and first <TT>read(), write()</TT> <I>or other
+<TT>ioctl()</TT> </I>call made to the device. Effect of changing sampling
+parameters when the device is active is undefined. The device must be reset
+using <TT>ioctl(SNDCTL_DSP_RESET)</TT> before it can accept new sampling
+parameters.</FONT></B>&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> <A NAME="sample_format"></A>Selecting audio format</H3>
+</TD>
+
+<TD>Sample format is an important parameter which affects quality of audio
+data. OSS API supports several different sample formats but most devices
+support just few of them. <TT><A HREF="sndcrd.html">soundcard.h</A></TT>
+defines the following sample format identifiers:&nbsp;
+
+<UL>
+<LI>
+<TT>AFMT_QUERY</TT> is not an audio format but an identifier used when
+querying current audio format.</LI>
+
+<LI>
+<TT>AFMT_MU_LAW</TT> is logarithmic mu-Law audio encoding.</LI>
+
+<LI>
+<TT>AFMT_A_LAW</TT> is logarithmic A-Law audio encoding.</LI>
+
+<LI>
+<TT>AFMT_IMA_ADPCM</TT> is 4:1 compressed format where 16 bit audio
+sequence isrepresented using average of 4 bits per sample. There are several
+different ADPCM formats and this one is defined by Interactive Multimedia
+Association (IMA). The Creative ADPCM format used in SB16 is not compatible
+with this one.</LI>
+
+<LI>
+<TT>AFMT_U8</TT> this is the standard unsigned 8 bit audio encoding
+used in PC soundcards.</LI>
+
+<LI>
+<TT>AFMT_S16_LE</TT> is the standard 16 bit signed little endian (Intel)
+sample format used in PC soundcards.</LI>
+
+<LI>
+<TT>AFMT_S16_BE</TT> is a big endian (M68k, PPC, Sparc, etc) variant
+of the 16 bit signed format.</LI>
+
+<LI>
+<TT>AFMT_S8</TT> is signed 8 bit audio format.</LI>
+
+<LI>
+<TT>AFMT_U16_LE</TT> is unsigned little endian 16 bit format.</LI>
+
+<LI>
+<TT>AFMT_U16_BE</TT> is unsigned big endian 16 bit format.</LI>
+
+<LI>
+<TT>AFMT_MPEG</TT> is the MPEG audio format (currently not supported).</LI>
+</UL>
+It is important to know that just the 8 bit unsigned format (<TT>AFMT_U8</TT>)
+is supported by most devices in hardware level. (however there are &quot;high
+end&quot; devices which support only 16 bit formats). Other commonly supported
+formats are <TT>AFMT_S16_LE</TT> and <TT>AFMT_MU_LAW</TT>. With many devices
+<TT>AFMT_MU_LAW</TT> is emulated using software based translation (lookup
+table) between mu-Law and 8 bit encoding (causes poor quality when compared
+with straight 8 bits).&nbsp;
+<BR>
+<BR>Applications should check that the sample format they require is supported
+by the device. Unsupported formats should be handled by converting data
+to another format (usually <TT>AFMT_U8</TT>). Alternatively the program
+should abort if it cannot do the conversion. <B>Trying to play data in
+unsupported format is a fatal error. The result is usually just LOUD noise
+which may damage ears, headphones, speakers, amplifiers, concrete walls
+and other unprotected objects.</B>&nbsp;
+<BR>
+<BR>The above format identifiers have been selected so that <TT>AFMT_U8</TT>=8
+and <TT>AFMT_S16_LE</TT>=16. This makes these identifiers compatible with
+older <TT>ioctl()</TT> calls which were used to select number of bits.
+This is valid just for these two formats so format identifiers should not
+be used as sample sizes in programs.&nbsp;
+<BR>
+<BR><TT>AFMT_S16_NE</TT> is a macro provided for convenience. It is defined
+to be <TT>AFMT_S16_LE</TT> or <TT>AFMT_S16_BE</TT> depending of endianess
+of the processor where the program is being run.&nbsp;
+<BR>
+<BR>Number of bits required to store a sample is:&nbsp;
+
+<UL>
+<LI>
+4 bits for the IMA ADPCM format.</LI>
+
+<LI>
+8 bits for 8 bit formats, mu-Law and A-Law.</LI>
+
+<LI>
+16 bits for the 16 bit formats</LI>
+
+<LI>
+Undefined for the MPEG audio format</LI>
+</UL>
+Sample format can be set using <TT>ioctl</TT> call <TT>SNDCTL_DSP_SETFMT</TT>.
+The following code fragment sets audio format to <TT>AFMT_S16_LE</TT>.
+It can be easily modified for other formats too:&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD>
+<PRE><TT>int format;</TT></PRE>
+<TT>format = AFMT_S16_LE;</TT>&nbsp;
+<BR><TT>if (ioctl(audio_fd, SNDCTL_DSP_SETFMT, &amp;format)==-1)</TT>&nbsp;
+<BR><TT>{ /* Fatal error */</TT>&nbsp;
+<BR><TT>perror(&quot;SNDCTL_DSP_SETFMT&quot;);</TT>&nbsp;
+<BR><TT>exit(<I>Error code</I>);</TT>&nbsp;
+<BR><TT>}</TT>&nbsp;
+<BR>
+<BR><TT>if (format != AFMT_S16_LE)</TT>&nbsp;
+<BR><TT>{</TT>&nbsp;
+<BR><I><TT>The device doesn't support the requested audio format. The program</TT></I>&nbsp;
+<BR><I><TT>should use another format (for example the one returned in &quot;format&quot;)</TT></I>&nbsp;
+<BR><I><TT>or alternatively it must display an error message and to abort.</TT></I>&nbsp;
+<BR><TT>}</TT>&nbsp;
+</TD>
+</TR>
+</TABLE>
+The above <TT>ioctl()</TT> call returns currently used format if <TT>AFMT_QUERY</TT>
+is passed in the argument.&nbsp;
+<BR>
+<BR>It is very important to check that the value returned in the argument after
+the ioctl call matches the requested format. If the device doesn't support
+this particular format, it rejects the call and returns another format
+which is supported by the hardware.&nbsp;
+<BR>
+<BR>A program can check which formats are supported by the device by calling
+<TT>ioctl SNDCTL_DSP_GETFMTS</TT> like in the following:&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD>
+<UL>
+<PRE>int mask;
+
+if (ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &amp;mask) == -1)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<I>Handle fatal error</I>}
+
+if (mask &amp; AFMT_MPEG)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<I>The device supports AFMT_MPEG<TT>}</TT></I></PRE>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<B>Note!</B>&nbsp;
+<BR>
+<BR><TT>SNDCTL_DSP_GETFMTS</TT> returns only the sample formats that are actually
+supported by the hardware. It is possible that the driver supports more
+formats using some kind of software conversions (signed &lt;-&gt; unsigned,
+big endian &lt;-&gt; little endian or 8bits &lt;-&gt; 16bits). These emulated
+formats are not reported by this ioctl() but <TT>SNDCTL_DSP_SETFMT</TT>
+accepts them. The software conversions consume significant amount of CPU
+time so they should be avoided. Use this feature only if it is not possible
+to modify the application to produce supported data format directly.&nbsp;
+<BR>
+<BR><TT>AFMT_MU_LAW</TT> is a data format which is supported with all devices.
+OSS versions before 3.6 reported this format always in <TT>SNDCTL_DSP_GETFMTS.</TT>Versions
+3.6 and later report it only if the device supports mu-Law format in hardware.
+This encoding is to be used only with applications and audio files ported
+from systems using mu-Law encoding (SunOS).&nbsp;
+<HR NOSHADE WIDTH="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> <A NAME="channels"></A>Selecting number of channels</H3>
+(mono/stereo)
+</TD>
+
+<TD>Most modern audio devices support stereo mode (the default mode is
+mono). An application can select stereo mode by calling <TT>ioctl SNDCTL_DSP_STEREO</TT>
+like below. <B>It is important to notice that only values 0 and 1 are allowed.
+Result of using any other value is undefined.</B>&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD>
+<UL>
+<PRE>int stereo = 1;&nbsp;&nbsp;&nbsp;&nbsp; /* 0=mono, 1=stereo */</PRE>
+
+<PRE>if (ioctl(audio_fd, SNDCTL_DSP_STEREO, &amp;stereo)==-1)
+{ /* Fatal error */
+&nbsp;&nbsp;&nbsp; perror(&quot;SNDCTL_DSP_STEREO&quot;);
+&nbsp;&nbsp;&nbsp; exit(<I>Error code</I>);
+}
+
+if (stereo != 1)
+{
+&nbsp;&nbsp;&nbsp; <I>The device doesn't support stereo mode.
+</I>}</PRE>
+</UL>
+</TD>
+</TR>
+</TABLE>
+Alternatively you can use <TT>ioctl(SNDCTL_DSP_CHANNELS)</TT>which accepts
+number of channels (currently only 1 or 2) as the argument.&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD><B><FONT COLOR="#FF0000">NOTE! Applications must select number of channels
+and number of bits before selecting speed. There are devices which have
+different maximum speeds for mono and stereo modes. The program will behave
+incorrectly if number of channels is changed after setting the card to
+high speed mode. Speed must be selected before first read or write call
+to the device.</FONT></B>&nbsp;
+</TD>
+</TR>
+</TABLE>
+An application should check the value returned in the variable pointed
+by the argument. Many older (SB1.x and SB2.x compatible) devices don't
+support stereo. As well there are high end devices which support only stereo
+modes.&nbsp;
+<HR WIDTH="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> <A NAME="speed"></A>Selecting sampling rate (speed)</H3>
+</TD>
+
+<TD>Sampling rate is the parameter that determines much of the quality
+of an audio sample. OSS API permits selecting any frequency between 1 Hz
+and 2 GHz. However in practice there are limits set by the audio device
+being used. The minimum frequency is usually 5 kHz while the maximum frequency
+varies widely. Oldest sound cards supported at most 22.05 kHz (playback)
+or 11.025 kHz (recording). Next generation supported 44.1 kHz (mono) or
+22.05 kHz (stereo). With modern sound devices the limit is 48 kHz (DAT
+quality) but there are still few popular cards that support just 44.1 kHz
+(audio CD quality).&nbsp;
+<BR>
+<BR>The default sampling rate is 8 kHz. However an application should not depend
+on the default since there are devices that support only higher sampling
+rates. The default rate could be as high as 48 kHz with such devices.&nbsp;
+<BR>
+<BR>Codec devices usually generate the sampling clock by dividing frequency
+of a high speed crystal oscillator. In this way it is not possible to generate
+all possible frequencies in the valid range. For this reason the driver
+always computes the valid frequency which is closest to the requested one
+and returns it to the calling program. The application should check the
+returned frequency and to compare it with the requested one. Differences
+of few percents should be ignored since they are usually not audible.&nbsp;
+<BR>
+<BR>The following code fragment can be used to select the sampling speed:&nbsp;
+
+<TABLE BORDER >
+<TR>
+<TD>
+<PRE><TT>int speed = 11025;</TT></PRE>
+<TT>if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &amp;speed)==-1)</TT>&nbsp;
+<BR><TT>{ /* Fatal error */</TT>&nbsp;
+<BR><TT>perror(&quot;SNDCTL_DSP_SPEED&quot;);</TT>&nbsp;
+<BR><TT>exit(<I>Error code</I>);</TT>&nbsp;
+<BR><TT>}</TT>&nbsp;
+<BR>
+<BR><TT>if (<I>returned speed differs significantly from the requested one</I>)</TT>&nbsp;
+<BR><TT>{</TT>&nbsp;
+<BR><I><TT>The device doesn't support the requested speed.</TT></I>&nbsp;
+<BR><TT>}</TT>&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+
+<TABLE BORDER >
+<TR>
+<TD><B><FONT COLOR="#FF0000">NOTE! Applications must select number of channels
+and number of bits before selecting speed. There are devices which have
+different maximum speeds for mono and stereo modes. The program will behave
+incorrectly if number of channels is changed after setting the card to
+high speed mode. Speed must be selected before first read or write call
+to the device.</FONT></B>&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> Other commonly used ioctl calls</H3>
+</TD>
+
+<TD>It is possible to implement most audio processing programs without using
+other <TT>ioctl</TT> calls than the three ones described earlier. This
+is possible if the application just opens the device, sets parameters,
+calls reads or writes continuously (without noticeable delays or pauses)
+and finally closes the device. This kind of applications can be described
+as &quot;stream&quot; or &quot;batch&quot; applications.&nbsp;
+<BR>
+<BR>There are three additional calls which may be required with slightly more
+complicated programs. These new calls are the following:&nbsp;
+
+<UL>
+<LI>
+<A NAME="dsp_sync"></A><TT>ioctl(audio_fd, SNDCTL_DSP_SYNC, 0)</TT>
+can be used when application wants to wait until last byte <B>written</B>
+to the device has been played (it doesn't wait in recording mode). After
+that the call resets (stops) the device and returns back to the calling
+program. Note that this call may take several seconds to execute depending
+on the amount of data in the buffers. <TT>close()</TT> calls <TT>SNDCTL_DSP_SYNC</TT>
+automaticly.</LI>
+
+<LI>
+<A NAME="dsp_reset"></A><TT>ioctl(audio_fd, SNDCTL_DSP_RESET, 0)</TT>
+stops the device immediately and returns it to the state where it can accept
+new parameters.</LI>
+
+<LI>
+<A NAME="dsp_post"></A><TT>ioctl(audio_fd, SNDCTL_DSP_POST, 0)</TT>
+is light weight version of <TT>SNDCTL_DSP_SYNC</TT>. It just tells to the
+driver that there is likely to be a pause in the output. This makes it
+possible to the device to handle the pause more intelligently.</LI>
+</UL>
+<FONT COLOR="#FF0000">Note! All of these calls are likely to cause clicks
+or unnecessary pauses to output. You should use them only when they are
+required (see below).</FONT>&nbsp;
+<BR>
+<BR>There are few places where these calls should be used:&nbsp;
+
+<UL>
+<LI>
+You should call <TT>SNDCTL_DSP_POST</TT> when your program is going
+to pause continuous output of audio data for relatively long time. This
+kind of situations are for example the following:</LI>
+
+<UL>
+<LI>
+After playing a sound effect when a new one is not started immediately
+(another way is to output silence until next effect starts).</LI>
+
+<LI>
+Before the application starts waiting for user input.</LI>
+
+<LI>
+Before starting lengthy operation such as loading a large file to memory.</LI>
+</UL>
+
+<LI>
+<TT>SNDCTL_DSP_RESET</TT> or <TT>SNDCTL_DSP_SYNC</TT> should be called
+when the application wants to change sampling parameters (speed, number
+of channels or number of bits).</LI>
+
+<LI>
+The application must call <TT>SNDCTL_DSP_SYNC</TT> or <TT>SNDCTL_DSP_RESET</TT>.
+Before switching between recording and playback modes (or alternatively
+it should close and reopen the audio device).</LI>
+
+<LI>
+You can use <TT>SNDCTL_DSP_RESET</TT> when playback should be stopped
+(cancelled) immediately.</LI>
+
+<LI>
+Call <TT>SNDCTL_DSP_RESET</TT> after recording (after last read from
+the device) if you are not going to close the device immediately. This
+stops the device and prevents the driver from displaying an unnecessary
+error message about recording overrun.</LI>
+
+<LI>
+Call <TT>SNDCTL_DSP_SYNC</TT> when you want to wait until all data
+has been played.</LI>
+</UL>
+
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> Interpreting audio data</H3>
+</TD>
+
+<TD>Encoding of audio data depends on the <A HREF="#sample_format">sample
+format</A>. There are several possible formats and only the most common
+ones are described here.&nbsp;
+
+<UL>
+<LI>
+mu-Law (logarithmic encoding)</LI>
+<BR>This is a format originated from digital telephone technology. Each sample
+is represented as a 8 bit value which is compressed from the original 16
+bit value. Due to logarithmic encoding, the value must be converted to
+linear format before used in computations (summing two mu-Law encoded values
+gives nothing useful). The actual conversion procedure is beyond the scope
+of this text. Avoid mu-Law if possible and use the 8 or 16 bit linear formats.&nbsp;
+
+<LI>
+8 bit unsigned</LI>
+<BR>This is the normal PC sound card (&quot;Sound Blaster&quot;) format which
+is supported by practically any hardware. Each sample is stored in a 8
+bit byte. Value of 0 represents the minimum level and 255 the maximum.
+The neutral level is 128 (0x80). However in most cases there is some noise
+in recorded &quot;silent&quot; files so the byte values may vary between
+127 (0x7f) and 129 (0x81).&nbsp;
+<BR>The C data type to be used is <TT>unsigned char. </TT>In case there is
+need to convert between unsigned and signed 8 bit formats, you should add
+or subtract 128 from the value to be converted (depending on the direction).
+In practice, XORing the value with 0x80 does the same (value ^= 0x80).&nbsp;
+
+<LI>
+16 bit signed</LI>
+<BR><FONT COLOR="#FF0000"><B>Caution! Great care must be taken when working
+with 16 bit formats. 16 bit data is not portable and depends on design
+of both CPU and the audio device.</B> </FONT>The situation is simple when
+using a (little endian) x86 CPU with a &quot;normal&quot; soundcard. In
+this case both the CPU and the soundcard use the same encoding for 16 bit
+data. However the same is not true when using 16 bit encoding in big endian
+environment such as Sparc, PowerPC or HP-PA.&nbsp;
+<BR>
+<BR>The 16 bit encoding normally used by sound hardware is little endian (<TT>AFMT_S16_LE</TT>).
+However there are machines with built in audio chip which support only
+big endian encoding.&nbsp;
+<BR>When using signed 16 bit data, the C data type best matching this encoding
+is usually <TT>signed short</TT>. However this is true only in little endian
+machines. In addition C standards don't define sizes of particular data
+types so there is no guarantee that <TT>short</TT> is 16 bits long in all
+machines (in future). For this reason using array of <TT>signed short</TT>
+as an audio buffer should be considered as a programming error although
+it is commonly used in audio applications.&nbsp;
+<BR>The proper way is to use array of <TT>unsigned char</TT> and to manually
+assemble/disassemble the buffer to be passed to the driver. For example:&nbsp;
+</UL>
+
+
+<TABLE BORDER >
+<TR>
+<TD>
+<UL>
+<PRE>unsigned char devbuf[4096];&nbsp;&nbsp;
+int applicbuf[2048];
+int i, p=0;</PRE>
+
+<PRE>/* Place 2048 samples (16 bit) into applicbuf[] here */</PRE>
+
+<PRE>for (i=0;i&lt;2048;i+=2)
+{
+/* first send the low byte then the high byte */
+&nbsp;&nbsp; devbuf[p++] = (unsigned char)(applicbuf[i] &amp; 0xff);&nbsp;
+&nbsp;&nbsp; devbuf[p++] = (unsigned char)((applicbuf[i] &gt;&gt; 8) &amp; 0xff);&nbsp;
+}</PRE>
+
+<PRE>/* Write the data to the device */</PRE>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<UL>Disassembling the data after input from the file should be performed
+in similar way (exercise).&nbsp;
+</UL>
+
+<HR WIDTH="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> Encoding stereo data</H3>
+</TD>
+
+<TD>When using stereo data, there are two samples for each time slot. The
+left channel data is always stored before right channel data. The samples
+for both channels are encoded as described above.&nbsp;
+<BR>
+<BR>Representation of samples to be used with more than 2 channels is to be
+defined in future.&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3> Conclusion</H3>
+</TD>
+
+<TD>The above is all you need to use when implementing &quot;basic&quot;
+audio applications. There are many other ioctl calls but they are usually
+not required. However there are &quot;real time&quot; audio applications
+such as games, voice conferencing systems, sound analysis tools, effect
+processors and many others. Unfortunately the above is not enough when
+implementing this kind of programs. More information about other audio
+programming features can be found in the <A HREF="audio2.html">Making audio
+complicated</A> section. Be sure you understand everything described above
+before jumping into that page.&nbsp;
+</TD>
+</TR>
+</TABLE>
+<CENTER>
+<HR width=100%>
+<A HREF="mixer.html">
+<IMG SRC="../gifs/back.gif" HSPACE=5 VSPACE=5 BORDER=0 HEIGHT=59 WIDTH=57 ALIGN=ABSCENTER></A>
+<A HREF="mixer.html">Mixer programming</A>
+<A HREF="index.html">
+<IMG SRC="../gifs/menu.gif" HSPACE=5 VSPACE=5 BORDER=0 HEIGHT=58 WIDTH=54 ALIGN=ABSCENTER></A>
+<A HREF="index.html">Guide Menu</A>
+<A HREF="music.html"><IMG SRC="../gifs/front.gif" HSPACE=5 VSPACE=5 BORDER=0 HEIGHT=59 WIDTH=60 ALIGN=ABSCENTER></A>
+<A HREF="music.html">Music programming</A></CENTER>
+
+
+</BODY>
+</HTML>

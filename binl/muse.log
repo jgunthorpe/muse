@@ -1,0 +1,4 @@
+^ossdsp.cpp:196 InitPlay->SRate = 0 0
+
+^ossdsp.cpp:274 InitPlay->Done: Decided on 4096 bs, 16 bits, 48000 speed, 1 chans. Allocated 188416
+

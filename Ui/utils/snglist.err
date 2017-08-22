@@ -1,0 +1,9 @@
+snglist.cpp(34): Warning! W665: (col 14) temporary object used to initialize a non-constant reference 
+snglist.cpp(173): Warning! W472: (col 18) expression with side effect in 'sizeof' discarded 
+snglist.cpp(463): Warning! W665: (col 24) temporary object used to initialize a non-constant reference 
+snglist.cpp(475): Warning! W665: (col 30) temporary object used to initialize a non-constant reference 
+snglist.cpp(506): Warning! W665: (col 21) temporary object used to initialize a non-constant reference 
+snglist.cpp(534): Warning! W665: (col 19) temporary object used to initialize a non-constant reference 
+snglist.cpp(557): Warning! W665: (col 24) temporary object used to initialize a non-constant reference 
+snglist.cpp(569): Warning! W665: (col 30) temporary object used to initialize a non-constant reference 
+snglist.cpp(622): Warning! W665: (col 24) temporary object used to initialize a non-constant reference 

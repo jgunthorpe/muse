@@ -1,0 +1,96 @@
+#! /usr/bin/make -sf
+# -*- make -*-
+# This is a make file which invokes all sub makefiles in the correct order
+# To build a 100% pure copy of muse ./makefile.gmk rebuild is the best 
+# command. It will purge all generated output and then begin constructing
+# the program from scratch. With no target the make file will attempt
+# to build all the binaries. No depends generation will be done as that
+# is not needed usually.
+#
+# library can be used to build only the library files and include/*
+# If you take include/* and lib/?/* you will have a fully working copy
+# of the Muse C++ library.
+
+.PHONY: all binary program library veryclean dep depends clean rebuild \
+        disclean debian targz
+
+# Customay GNU style targets
+# This maybe should be rebuild?
+all: binary
+
+# This purges everything 
+distclean: veryclean
+maintainer-clean: veryclean
+
+# We detect our current directory and assume that it is the base directory
+# then export that to the children. This allows some degree of absoluteness
+# for paths
+export MUSE2BASE = $(shell pwd)
+
+# Multi line macro to build all the bits in the right order
+define MakeAll
+$(MAKE) -$(MAKEFLAGS) -C Utils -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C BaseSet -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/s3m -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/mod -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/xm -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/it -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/ult -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/far -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/669 -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Formats/ptm -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Outputs/mixers/base -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Outputs/mixers/filters/simpfilt -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Outputs/mixers/m32flat -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Outputs/file -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Outputs/oss/dsp -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Archiver -f makefile.gmk $@
+$(MAKE) -$(MAKEFLAGS) -C Test/test -f makefile.gmk $@
+endef
+
+binary:
+	$(MakeAll)
+
+program:
+	$(MakeAll)
+
+library:
+	$(MakeAll)
+	
+# This veryclean will purge all the .d files before it begins.
+# make sometimes attempts to rebuild the .d files after some of
+# the headers have been erased, big messy pain.
+veryclean:
+	-find -name "*.d" | xargs rm -f 2> /dev/null
+	$(MakeAll)
+
+depends:
+	$(MakeAll)
+
+clean:
+	$(MakeAll)
+
+rebuild: veryclean depends binary
+
+# Build a debian package for muse
+debian: binary
+	debian/rules binary
+
+# Build a .tar.gz package for muse's binary
+INSTALL      = /usr/bin/install -c
+INSTALL_BIN  = ${INSTALL} -m 755 -s
+INSTALL_FILE = ${INSTALL} -m 644
+tmp = tmp/Muse
+targz: binary
+	-rm -rf $(tmp)
+	mkdir -p $(tmp)
+
+	echo Placing Files
+	$(INSTALL_BIN) binl/muse $(tmp)
+	$(INSTALL_FILE) muse.txt $(tmp)
+	$(INSTALL_FILE) copyright $(tmp)
+	$(INSTALL_FILE) history.txt $(tmp)
+	
+	echo Building .tar.gz file in ..
+	cd tmp;tar -czf ../../muse_1.4.0-elf.tar.gz Muse
+	rm -rf $(tmp)

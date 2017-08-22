@@ -1,0 +1,35 @@
+PLATFORM = OS2
+!include ..\..\..\makedefs.w32
+
+all: $(BINDIR)\Muse2Txt.exe
+
+OBJS = $(OUTDIR)\Muse2Txt.obj $(OUTDIR)\Screen.obj &
+       $(OUTDIR)\CommandLine.obj $(OUTDIR)\SongList.obj $(OUTDIR)\Displays.obj &
+       $(OUTDIR)\Pipe.obj
+
+
+LIBS = $(LIBDIR)\SOM.lib $(LIBDIR)\S3M.lib $(LIBDIR)\BaseSet.lib &
+       $(LIBDIR)\File.lib $(PLIBDIR)\DAC.lib $(PLIBDIR)\mmpm2.lib &
+       $(PLIBDIR)\GUSMixer.lib $(LIBDIR)\MOD.lib $(LIBDIR)\XM.lib $(LIBDIR)\IT.lib &
+       $(LIBDIR)\669.lib $(LIBDIR)\FAR.lib $(LIBDIR)\ULT.lib &
+       $(LIBDIR)\PTM.lib
+
+$(BINDIR)\Muse2Txt.exe: $(OBJS) $(LIBS) Muse2Txt.res
+   echo Linking $^@
+   $(LINK) $(OBJS) $(LIBS)
+   rc Muse2Txt.res $(BINDIR)\Muse2Txt.exe
+
+$(OUTDIR)\songlist.obj: songlist.cpp songlist.h
+
+$(OUTDIR)\CommandLine.obj: CommandLine.cpp SongList.h Screen.h
+
+$(OUTDIR)\Screen.obj: Screen.cpp SongList.h Screen.h Displays.h
+
+$(OUTDIR)\Displays.obj: Displays.cpp Displays.h Screen.h
+
+$(OUTDIR)\Muse2Txt.obj: Muse2Txt.cpp Screen.h
+
+$(OUTDIR)\Pipe.obj: Pipe.cpp Screen.h Displays.h
+
+Muse2Txt.res: Muse2Txt.rc usage.txt
+   rc -r Muse2Txt.rc Muse2Txt.res

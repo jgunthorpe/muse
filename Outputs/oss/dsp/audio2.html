@@ -1,0 +1,812 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Hannu Savolainen">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.0b2 (Win95; I) [Netscape]">
+   <TITLE>Open Sound System - Audio programming 2</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#8000FF" VLINK="#FF0000" ALINK="#FFFF00">
+
+
+<TABLE BORDER WIDTH="100%" >
+<TR>
+<TD><IMG SRC="../gifs/logo.gif" HSPACE=5 VSPACE=5 HEIGHT=45 WIDTH=121>&nbsp;
+</TD>
+
+<TD>
+<CENTER>
+<H1>
+<FONT COLOR="#8080FF">Making audio complicated</FONT></H1></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BLINK><FONT COLOR="#FF0000"><FONT SIZE=+2>Under construction!</FONT></FONT></BLINK>&nbsp;
+<BR><FONT COLOR="#FF0000">This page is currently being written. A more complete
+version should be released shortly.</FONT>
+<BR><FONT COLOR="#FF0000">Last updated Fri 16 Aug 1996 (minor changes).</FONT>&nbsp;
+
+<TABLE CELLPADDING=10 >
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+Introduction&nbsp;</H3>
+</TD>
+
+<TD>This chapter could be called &quot;Advanced audio programming&quot;
+as well. However I'm trying to avoid advertising features described here
+too much. These features are very useful or even necessary when used in
+the right place. However they don't automatically make your application
+better if used in situations when they are not necessary. Some of the features
+to be presented below don't work with all devices (<A HREF="audio2.html#fulldup">full
+duplex audio</A> and <A HREF="audio2.html#mmap">direct DMA access</A> among
+others) or make your application very operating system dependent (<A HREF="audio2.html#mmap">direct
+DMA access</A>).&nbsp;
+<BR>
+<BR><B>It is assumed that you have perfect understanding about the features
+described in the <A HREF="intro.html">introduction</A> and <A HREF="audio.html">basic
+audio sections</A> of this guide. The features described here will work
+only if the guidelines defined in the basic sections have been followed
+carefully.</B>&nbsp;
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<CENTER>
+<H3>
+Audio Internals</H3></CENTER>
+</TD>
+
+<TD>Application program doesn't (normally) access audio hardware directly.
+All data being recorded or played back is stored in a kernel DMA buffer
+while the device is accessing it. The application uses normal <TT>read</TT>
+and <TT>write</TT> calls to transfer data between the kernel buffer and
+the buffer in the application's data segment.&nbsp;
+<BR>
+<BR>The audio driver uses improved version of so called <I>double buffering</I>
+method. In the basic double buffering method there are two buffers. One
+of them is being accessed by the device while the other is being read or
+written by the application. When the device gets the first buffer processed,
+it moves to the other one. This process is repeated as long as the device
+is in use. This method gives the application time to do some processing
+at the same time when the device is running. This makes it possible to
+record and playback without pauses.&nbsp;
+<BR>
+<BR>The amount of time the application can spend on processing the buffer half
+depends on the buffer size and the data rate. For example when a program
+is recording audio using 8 kHz/8 bits/mono sampling, the data rate is 8
+kilobytes/second. If there is 2*4 kbytes of buffer, it gives the application
+more than 0.5 seconds of time to store the data to disk and to come back
+to read from the device. If it spends more than 0.5 seconds, the buffer
+overruns and the driver has to discard some data. 0.5 seconds is pretty
+much of time to store 4 kbytes of data to disk. However things become more
+complicated when data rate is increased. For example with audio CD quality
+the data rate is 172 kilobytes/second the available time is just 23 milliseconds.
+It is about the same than worst case seek time of normal disk drives which
+means that recording is likely to fail. better results can be achieved
+by using larger buffers but it increases latencies related to the buffering.&nbsp;
+<BR>
+<BR>The method used by the audio driver of OSS could be called as <I>multi-buffering</I>.
+In this method the available buffer space is divided to several equally
+sized blocks which are called as <I>fragments</I>. In this way it is possible
+to increase available buffer size without increasing latencies related
+to the buffering. By default the driver computes the fragment size so that
+latencies are about 0.5 seconds (for output) or about 0.1 seconds (for
+input) using the current data rate. There is a ioctl call for adjusting
+the fragment size in case the application wants to use different size.&nbsp;
+<BR>
+<BR>[TODO: Insert an illustration here]&nbsp;
+
+<H3>
+Normal operation when writing to the device</H3>
+When the program calls <TT>write</TT> first time after opening the device,
+the driver performs the following steps:&nbsp;
+
+<UL>
+<LI>
+Programs the audio hardware to use the sampling parameters (speed,
+channels and bits) the program has selected.</LI>
+
+<LI>
+Computes suitable size for a buffer fragment (only if the program doesn't
+have requested specific fragment size explicitly).</LI>
+
+<LI>
+Starts filling the first buffer fragment with the data written by the
+application.</LI>
+
+<LI>
+If enough data was written to fill the first fragment completely, the
+device is started to play it.</LI>
+
+<LI>
+Finally the driver copies rest of the data to the buffer. If all buffer
+fragments have been used, the application is put to wait until the first
+buffer gets played completely.</LI>
+</UL>
+NOTE! At this point it is possible that the device was not started to play
+the data. This happens if the application doesn't write enough data to
+fill one buffer fragment completely. There is no reason to worry about
+this if the application is going to write more data to the device as soon
+as it can or if it closes the device immediately. However (<B>only</B>)
+if there is going to be a pause of arbitrary length, the application should
+call <TT><A HREF="audio.html#dsp_post">ioctl(SNDCTL_DSP_POST)</A></TT>
+to activate the playback.&nbsp;
+<BR>
+<BR>When the application calls write second time, the data is simply stored
+to the playback buffer and internal pointers of the driver are updated
+accordingly. If the application has attempted to write more data than there
+is currently free space on the buffer, it will be forced to wait until
+one fragment gets completely played by the device. This is the normal situation
+with programs that work properly. They usually write data at least slightly
+faster than the device plays it. Sooner or later they get the buffer completely
+filled and the driver forces them to work at the same speed with the device.&nbsp;
+<BR>
+<BR>A <I>playback underrun</I> situation occurs when the application fails
+to write more data before the device gets earlier data completely played.
+This kind of underrun occurs if:&nbsp;
+
+<UL>
+<LI>
+The application needs too much time for processing the data. For example
+the program is being run on a too slow CPU or there are many other applications
+using the processor. Also loading audio data from a floppy disk is likely
+to fail. It is usually very difficult and often impossible to find a solution
+to this kind of underrun problem. Possibly only writing some parts of the
+program in assembler could help.</LI>
+
+<LI>
+There is slight variations in amount of CPU time the application gets.
+In this way application which normally works fast enough may randomly run
+out of time.</LI>
+
+<LI>
+The application attempts to work too much in real time. Having less
+data in the output buffer decreases delays in games and other real time
+applications. However the application must take care that it always writes
+new data before earlier written samples get completely played.</LI>
+</UL>
+Effect of underrun depends on the audio device. However in almost every
+case an audible defect is caused in the playback signal. This may be just
+a short pause, a click or a repeated section of signal. Repeated underruns
+may cause very strange effects. For example 100 underruns per second causes
+sometimes a signal having frequency of 100 Hz (it could be very difficult
+to find the reason which causes this effect).&nbsp;
+
+<H3>
+Normal operation when reading from the device</H3>
+When the program calls <TT>read </TT>first time after opening the device,
+the driver performs the following steps:&nbsp;
+
+<UL>
+<LI>
+Programs the audio hardware to use the sampling parameters (speed,
+channels and bits) the program has selected.</LI>
+
+<LI>
+Computes suitable size for a buffer fragment (only if the program doesn't
+have requested specific fragment size explicitly).</LI>
+
+<LI>
+Activates recording process on the device</LI>
+
+<LI>
+Puts the application to wait until first fragment of data gets recorded
+by the device. Note that the application will wait until the whole fragment
+gets recorded even if it attempted to read just one byte.</LI>
+
+<LI>
+After recording of the first fragment is ready, it is contents up to
+the amount requested by the application will be copied to the application's
+buffer variable.</LI>
+
+<LI>
+The read call returns after all bytes requested by the application
+have been read. If there is more data on the driver's buffer, it is left
+there.</LI>
+</UL>
+Subsequent reads work just like the first one except that the device doesn't
+need to be started again.&nbsp;
+<BR>
+<BR>A <I>recording overrun</I> situation occurs if the device fills the recording
+buffer completely. If this happens, the device is stopped and further samples
+being recorded will be discarded. Reasons of recording overruns are very
+similar than causes of playback underruns. A very common situation where
+playback overrun may occur is recording of high speed audio directly to
+disk. In Linux this doesn't work except with very fast disk (in other environments
+this should not be a problem).&nbsp;
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+Buffering - Improving real time performance</H3>
+</TD>
+
+<TD>Normally programs don't need to care about buffering parameters of
+audio devices. However most of the features presented in this document
+have been designed to work with full fragments. For this reason your program
+may work better if it reads and writes data one buffer fragment at time
+(please note that this is not normally required).&nbsp;
+
+<H3>
+<A NAME="get_buffer_info"></A><B><FONT SIZE=+1>Determining buffering
+parameters</FONT></B></H3>
+The driver computes the optimum fragment size automatically depending on
+sampling parameters (speed, bits and number of channels) and amount of
+available memory. Application may ask the buffer size by using the following
+ioctl call.&nbsp;
+
+<UL>
+<PRE>int frag_size;</PRE>
+
+<PRE><A NAME="getblksize"></A>if (ioctl(audio_fd, SNDCTL_DSP_GETBLKSIZE, &amp;frag_size) == -1) error();</PRE>
+</UL>
+The fragment size in bytes is returned in the <TT>frag_size</TT>. The application
+may use this value as the size when allocating (<TT>malloc</TT>) buffer
+for audio data and the count when reading from or writing to the device.&nbsp;
+<BR>
+<BR><B>NOTE!</B> This ioctl call also computes the fragment size in case it
+has not already been done. For this reason you should call it only after
+setting sampling parameters or setting fragment size explicitly.&nbsp;
+<BR>
+<BR><B>NOTE2!</B> Some (old) audio applications written for Linux check that
+the returned fragment size is between arbitrary limits (this was necessary
+with version 0.1 of the driver). New applications should not make this
+kind of test.&nbsp;
+<BR>
+<BR>The above call returns the &quot;static&quot; fragment size. There are
+two additional calls which return information about the live situation.&nbsp;
+
+<UL>
+<PRE>audio_buf_info info;</PRE>
+
+<PRE><A NAME="getispace"></A>ioctl(audio_fd, SNDCTL_DSP_GETISPACE, &amp;info);</PRE>
+
+<PRE><A NAME="getospace"></A>ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &amp;info);</PRE>
+</UL>
+The above calls return information about output and input buffering (respectively).
+The <TT><A HREF="sndcrd.html#audio_buf_info">audio_buf_info</A></TT> record
+contains the following fields:&nbsp;
+
+<UL>
+<LI>
+<TT>int fragments;&nbsp;</TT></LI>
+<BR>Number of full fragments that can be read or written without blocking<TT>.
+</TT>Note that this field is reliable only when the application reads/writes
+full fragments at time.&nbsp;
+
+<LI>
+<TT>int fragstotal;&nbsp;</TT></LI>
+<BR>Total number of fragments allocated for buffering.&nbsp;
+
+<LI>
+<TT>int fragsize;&nbsp;</TT></LI>
+<BR>Size of a fragment in bytes. This is the same value than returned by <TT>ioctl(SNDCTL_DSP_GETBLKSIZE)</TT>.&nbsp;
+
+<LI>
+<TT>int bytes;&nbsp;</TT></LI>
+<BR>Number of bytes that can be read or written immediately without blocking.&nbsp;
+</UL>
+These two calls together with <TT><A HREF="audio2.html#select">select()</A></TT>
+can be used writing asynchronous or non-blocking applications.&nbsp;
+
+<H3>
+<A NAME="setfragment"></A>Selecting buffering parameters</H3>
+In some cases it may be desirable to select the fragment size explicitly.
+For example in real time applications (such as games) it is necessary to
+use relatively short fragments. Otherwise delays between events on the
+screen and their associated sound effects become too long. OSS API contains
+an ioctl call for setting the fragment size and maximum number of fragments.&nbsp;
+
+<UL>
+<PRE>int arg = 0xMMMMSSSS;</PRE>
+
+<PRE>if (ioctl(audio_fd, SNDCTL_DSP_SETFRAGMENT, &amp;arg)) error();</PRE>
+</UL>
+Argument of this call is an integer encoded as <TT>0xMMMMSSSS</TT> (in
+hex). The 16 least significant bits determine the fragment size. The size
+is 2<SUP>SSSS</SUP>. For example <TT>SSSS</TT>=0008 gives fragment size
+of 256 bytes (2<SUP>8</SUP>). The minimum is 16 bytes (<TT>SSSS</TT>=4)
+and the maximum is total_buffer_size/2. Some devices or processor architectures
+may require larger fragments in this case the requested fragment size is
+automatically increased.&nbsp;
+<BR>The 16 most significant bits (<TT>MMMM</TT>) determine maximum number of
+fragments. By default the deriver computes this based on available buffer
+space. The minimum value is 2 and the maximum depends on the situation.
+Set <TT>MMMM</TT>=<TT>0x7fff</TT> if you don't want to limit the number
+of fragments.&nbsp;
+<BR>
+<BR><B>NOTE!</B> This ioctl call must be used as early as possible. The optimum
+location is immediately after opening the device. It is NOT possible to
+change fragmenting parameters second time without closing and reopening
+the device. Also note that calling <TT>read()</TT>, <TT>write()</TT> or
+<A HREF="audio2.html#get_buffer_info">the above three ioctl calls</A> &quot;locks&quot;
+the buffering parameters which may not be changed after that.&nbsp;
+<BR>
+<BR><B>NOTE2!</B> Setting the fragment size and/or number of fragments too
+small may have unexpected results (at least in slow machines). UNIX is
+multitasking environment where other processes may use CPU time unexpectedly.
+The application must ensure that the selected fragmenting parameters provide
+enough &quot;slack&quot; so that other concurrently running processes don't
+cause underruns. Each underrun causes a click or pause to the output signal.
+With relatively short fragments this may cause whining sound which is very
+difficult to identify. Using fragment sizes shorter than 256 bytes is not
+recommended as the default mode of application. Short fragments should
+only be used when explicitly requested by user.&nbsp;
+
+<H3>
+<A NAME="getxptr"></A>Obtaining buffering information (pointers)</H3>
+In some cases it is necessary for application to know exactly how much
+data has been played or recorded. The OSS API provides two ioctl calls
+for these purposes. Information returned by these calls are not precise
+in all cases. Some sound devices use internal buffering which make the
+returned pointer value very imprecise. In addition some operating systems
+don't allow obtaining value of the actual DMA pointer. Using these calls
+in applications is likely to make it non-portable between operating systems
+and makes them incompatible with many popular devices (such as the &quot;original&quot;
+Gravis Ultrasound). Applications should use <TT><A HREF="audio2.html#getcaps">ioctl(SNDCTL_DSP_GETCAPS)</A></TT>
+to check device capabilities before using these calls.&nbsp;
+
+<UL>
+<PRE>count_info info;</PRE>
+
+<PRE>ioctl(audio_fd, SNDCTL_DSP_GETIPTR, &amp;info);
+ioctl(audio_fd, SNDCTL_DSP_GETOPTR, &amp;info);</PRE>
+</UL>
+These calls return information about recording and playback pointers (respectively).
+The <TT><A HREF="sndcrd.html#count_info">count_info</A></TT> structure
+contains the following fields:&nbsp;
+
+<UL>
+<LI>
+<TT>int bytes;&nbsp;</TT></LI>
+<BR>Number of bytes processed since opening the device. This field divided
+by the number of bytes/sample can be used as a precise timer. However underruns,
+overruns and calls to some ioctl calls (<TT>SNDCTL_DSP_RESET, SNDCTL_DSP_POST</TT>
+and <TT>SNDCTL_DSP_SYNC</TT>) decrease precision of the value. Also some
+operating systems don't permit reading value of the actual DMA pointer
+so in these cases the value is truncated to previous fragment boundary.&nbsp;
+
+<LI>
+<TT>int blocks;&nbsp;</TT></LI>
+<BR>Number of fragment transitions (hardware interrupts) processed since previous
+call to this ioctl (the value is reset to 0 after each call). This field
+is valid only when using <A HREF="audio2.html#mmap">direct access to audio
+buffer</A>.&nbsp;
+
+<LI>
+<TT>int ptr;&nbsp;</TT></LI>
+<BR>This field is a byte offset of current playback/recording position from
+the beginning of audio buffer. This field has little value except when
+using <A HREF="audio2.html#mmap">direct access to audio buffer.</A>&nbsp;
+</UL>
+
+<H3>
+<A NAME="nonblock"></A>Non-blocking reads and writes</H3>
+All audio <TT>read</TT> and <TT>write</TT> calls are non-blocking as long
+as there is enough space/data in the buffer when the application makes
+the call.. The application may use <TT><A HREF="audio2.html#getospace">SNDCTL_DSP_GETOSPACE</A></TT>
+and <TT><A HREF="audio2.html#getispace">SNDCTL_DSP_GETISPACE</A></TT> to
+check device's status before making the call. The <TT>bytes</TT> field
+tells how many bytes can be read or written without blocking. It is highly
+recommended to read and write full fragments every time when using select.&nbsp;
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+<A NAME="select"></A>Using <TT>select()</TT></H3>
+</TD>
+
+<TD>OSS driver supports standard <TT>select()</TT> system call. With audio
+devices <TT>select</TT> returns 1 in the read or write descriptor bitmask
+when it is possible to read or write at least one byte without blocking.
+The application should <TT><A HREF="audio2.html#getospace">SNDCTL_DSP_GETOSPACE</A></TT>
+and <TT><A HREF="audio2.html#getispace">SNDCTL_DSP_GETISPACE</A></TT> to
+check the actual situation. Reading and writing full fragments at time
+is recommended when <TT>select()</TT> is used.&nbsp;
+<BR>
+<BR>Calling <TT>select()</TT> with the <TT>audio_fd</TT> bit set in the <TT>readfds</TT>
+parameter has an important side effect. This call starts recording immediately
+if it has not already started and recording is enabled. (Due to a bug in
+OSS versions earlier than 3.6 this may not work with all cards.)&nbsp;
+<BR>
+<BR>Some operating systems (such as Solaris) don't support <TT>select()</TT>.
+In these case the <TT>poll()</TT> system call can be used in place of select.&nbsp;
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+<A NAME="getcaps"></A>Checking device capabilities</H3>
+</TD>
+
+<TD>There are some features in the OSS API that don't work with all devices
+and/or operating systems. For this reason it is important to check that
+the features are available before trying to use them. Effect of using features
+not supported by current hardware/operating system combination is undefined.&nbsp;
+<BR>
+<BR>It is possible to check availability of certain features by using the <TT>SNDCTL_DSP_GETCAPS</TT>
+ioctl as below:&nbsp;
+
+<PRE>int caps;</PRE>
+
+<PRE>ioctl(audio_fd, SNDCTL_DSP_GETCAPS, &amp;caps);</PRE>
+This call returns a bitmask defining the available features. The possible
+bits are:&nbsp;
+
+<UL>
+<LI>
+<TT>DSP_CAP_REVISION</TT>. The 8 least significant bits of the returned
+bitmask is version number of this call. In current version it is 0. This
+field is reserved for future use.</LI>
+
+<LI>
+<TT>DSP_CAP_DUPLEX</TT> tells if the device has <A HREF="#fulldup">full
+duplex</A> capability. If this bit is not set, the device supports only
+half duplex (recording and playback is not possible at the same time).</LI>
+
+<LI>
+<TT>DSP_CAP_REALTIME</TT> bit tells if the device/operating system
+supports precise reporting of output pointer position using <TT><A HREF="#getxptr">SNDCTL_DSP_GETxPTR</A></TT>.
+Precise means that accuracy of the reported playback pointer (time) is
+around few samples. Without this capability the playback/recording position
+is reported using precision of one fragment.</LI>
+
+<LI>
+<TT>DSP_CAP_BATCH</TT> bit means that the device has some kind of local
+storage for recording and/or playback. For this reason the information
+reported by <TT><A HREF="#getxptr">SNDCTL_DSP_GETxPTR</A></TT> is very
+inaccurate.</LI>
+
+<LI>
+<TT>DSP_CAP_COPROC</TT> means that there is some kind of programmable
+processor or DSP chip assosiated with this device. This bit is currently
+undefined and reserved for future use.</LI>
+
+<LI>
+<TT>DSP_CAP_TRIGGER</TT> bit tells that <A HREF="#trigger">triggering
+of recording/playback</A> is possible with this device.</LI>
+
+<LI>
+<TT>DSP_CAP_MMAP</TT> tells if it is possible to get <A HREF="#mmap">direct
+access to the hardware level recording and/or playback buffer of the device</A>.</LI>
+</UL>
+
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+<A NAME="syncro"></A>Synchronization issues</H3>
+</TD>
+
+<TD>In some applications it is necessary to synchronize audio playback/recording
+with screen updates, MIDI playback or some other &quot;external&quot; events.
+This section describes some ways how it is possible to implement this kind
+of features. When using the features described in this section it is very
+important to access the device by writing and reading full fragments at
+time. Using partial fragments is possible but it may introduce problems
+which are very difficult to handle.&nbsp;
+<BR>
+<BR>There are several different reasons for using synchronization:&nbsp;
+
+<UL>
+<LI>
+The application should be able to work without blocking in audio reads
+or writes.</LI>
+
+<LI>
+There is need to keep external events in sync with audio (or to keep
+audio in sync with external events).</LI>
+
+<LI>
+Audio playback and recording needs to be done in sync.</LI>
+</UL>
+It is also possible to have several of the above goals at the same time.&nbsp;
+
+<H4>
+Avoiding blocking in audio operations</H4>
+The recommended method for implementing non-blocking reads or writes is
+to use <TT><A HREF="#select">select()</A></TT>. Further instructions for
+using this method has been given <A HREF="#nonblock">above</A>.&nbsp;
+
+<H4>
+Synchronizing external events with audio</H4>
+When there is need to get audio recording and playback to work in sync
+with screen updates, it is easier play audio at it is own speed and to
+synchronize screen updates with it. To do this, you can use the <TT><A HREF="#getxptr">SNDCTL_DSP_GETxPTR</A></TT>
+calls to obtain the number of bytes that have been processed since opening
+the device. Then divide the <TT>bytes</TT> field returned by the call by
+number of bytes per sample (for example 4 in 16bits stereo mode). To get
+the number of milliseconds since start you need to multiply the sample
+count by 1000 and to divide this by the sampling rate.&nbsp;
+<BR>
+<BR>In this way you can use normal UNIX alarm timers or <TT>select()</TT>to
+control the interval between screen updates while still being able to obtain
+exact &quot;audio&quot; time. Note that any kind of performance problems
+(playback underruns and recording overruns) disturb audio timing and decrease
+it is precision.&nbsp;
+
+<H4>
+Synchronizing audio with external events</H4>
+In games and some other real time applications there is need to keep sound
+effects playing at the same time with the game events. For example sound
+of an explosion should be played exactly at the time (or slightly later)
+with the flash on the screen.&nbsp;
+<BR>
+<BR>The recommended method to be used in this case is to decrease the <A HREF="#setfragment">fragment
+size and maximum number of fragments</A> used with the device. In most
+cases this kind of applications work best with just 2 or 3 fragments. A
+suitable fragment size can be determined by dividing the byte rate of audio
+playback by number of frames/second to be displayed by the game. It is
+recommended to avoid too tight timing since otherwise random performance
+problems may degrade audio output seriously.&nbsp;
+<BR>
+<BR>Another way to synchronize audio playback with other events is to use <A HREF="#mmap">direct
+access to audio device buffer</A>. However this way is not recommended
+since it is not possible with all devices and operating systems.&nbsp;
+<BR>
+<BR>When using the methods described above, there may be need to start playback
+and/or recording precisely at the right time (this should be somehow rare
+requirement). This is possible by using the <A HREF="#trigger">trigger
+feature</A> described below.&nbsp;
+
+<H4>
+Synchronizing recording and playback together</H4>
+In <B><A HREF="#fulldup">full duplex</A></B> applications it may be necessary
+to keep audio playback and recording synchronized together. For example
+it may be necessary to play back earlier recorded material at the same
+time when recording new audio tracks. Note that this kind of applications
+are possible only with devices supporting full duplex operation or by using
+two separate audio devices together. In the second case it is important
+that both devices support precisely the sampling rate to be used (otherwise
+synchronization is not possible). Use the <A HREF="#trigger">trigger feature</A>
+when you need this kind of synchronization.&nbsp;
+
+<H4>
+Implementing real time effect processors and other oddities</H4>
+Term &quot;real time&quot; means here an application which records audio
+data, performs some kind of processing on it and outputs it immediately
+without practically any delays. Unfortunately this kind of applications
+are not possible using UNIX like multitasking operating system and general
+purpose computer hardware. There is always some delay between recording
+a sample and before it is available for processing by the application (the
+same is true with playback too). In addition multitasking overhead (other
+simultaneously running processes) cause unexpected pauses in operation
+of the application itself. Normally this kind of operations are done with
+dedicated hardware with system software designed for this kind of use.&nbsp;
+<BR>
+<BR>It is possible to decrease the delay between input and output by decreasing
+the fragment size. In theory the fragment size can be as short as 16 bytes
+with a fast machine. However in practice it is difficult to get fragment
+sizes shorter than 128 to 256 bytes to work. Using <A HREF="#mmap">direct
+access to the hardware level audio buffer</A> may provide better results
+in systems where this feature works.&nbsp;
+<BR>
+<BR>If you still want to implement this kind of application, you should use
+short fragments together with select(). The shortest fragment size that
+works depends on situation and the only way to find it out is making some
+experiments. And (of cause) you should use a device with <A HREF="#fulldup">full
+duplex</A> capability or two separate devices together.&nbsp;
+
+<H4>
+<A NAME="trigger"></A>Starting audio playback and/or recording with
+precise timing</H4>
+The <TT>SNDCTL_DSP_SETTRIGGER</TT> ioctl call has been designed to be used
+in applications which require starting recording and/or playback with precise
+timing. Before you use this ioctl, you should check that <TT><A HREF="#getcaps">DSP_CAP_TRIGGER</A></TT>
+feature is supported by the device. Trying to use this ioctl with a device
+not supporting it will give undefined results.&nbsp;
+<BR>
+<BR>This ioctl accepts an integer parameter where two bits are used to enable
+and disable playback, recording or both. The <TT>PCM_ENABLE_INPUT</TT>
+bit controls recording and <TT>PCM_ENABLE_OUTPUT</TT> controls playback.
+These bits can be used together provided that the device supports <A HREF="#fulldup">full
+duplex</A> and the device has been opened for <TT>O_RDWR</TT> access. In
+other cases the application should use only one of these bits without reopening
+the device.&nbsp;
+<BR>
+<BR>The driver maintains these bits for each audio device (supporting this
+feature). Initially (after open) these bits are set to 1 which makes the
+device to work normally.&nbsp;
+<BR>
+<BR>Before the application can use the trigger ioctl to start device operations,
+the bit to be used should be set to 0. To do this you can use the following
+code. It is important to note that this can be done only immediately after
+opening the device (before writing to or reading from it). It is currently
+<B>NOT possible to stop or restart a device that has already been active
+without first reopening the device file.</B>&nbsp;
+
+<PRE>int enable_bits = ~PCM_ENABLE_OUTPUT; /* This disables playback */</PRE>
+
+<PRE>ioctl(audiofd, SNDCTL_DSP_SETTRIGGER, &amp;enable_bits);</PRE>
+After the above call writes to the device dont start the actual device
+operation. The application can fill the audio buffer by outputting data
+using write(). Write will return -1 with<TT> errno</TT> set to <TT>EAGAIN
+</TT>if the application tries to write when the buffer is full. This permits
+preloading the buffer with output data in advance. Calling <TT>read()when</TT>
+<TT>PCM_ENABLE_INPUT</TT> is not set will always return <TT>EAGAIN</TT>.&nbsp;
+<BR>
+<BR>To actually activate the operation, call <TT>SNDCTL_DSP_TRIGGER</TT> with
+the appropriate bits set. This will start the enabled operations immediately
+(provided that there is already data in the output buffer). It is also
+possible to leave one of the directions disabled while starting the another
+one.&nbsp;
+
+<H4>
+<A NAME="go"></A>Starting audio recording or playback in sync with
+/dev/sequencer or /dev/music</H4>
+In some cases it is necessary to synchronize playback of audio sequences
+with MIDI output (this is possible with recording too). To do this you
+need to suspend the device before writing to or reading from it. This can
+be done by calling <TT>ioctl(audiofd, SNDCTL_DSP_SETSYNCRO, 0)</TT>. After
+this the device works just like when both the recording and the playback
+trigger bits (see above) have been set to 0. The difference is that it
+is not possible to reactivate the device without using features of <A HREF="music.html">/dev/sequencer
+or /dev/music</A> (<TT>SEQ_PLAYAUDIO</TT> event).&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+<A NAME="fulldup"></A>Full duplex mode</H3>
+</TD>
+
+<TD><I>Full duplex</I> means audio devices capability to do input and output
+in parallel.&nbsp;
+<BR>
+<BR>Most audio devices are <I>half duplex</I> which means that they support
+both recording and playback but cant do them simultaneously due to hardware
+level limitations (some devices can't do recording at all). In this cases
+it is very difficult to implement applications which do both recording
+and playback. It is recommended that the device is reopened when switching
+between recording and playback.&nbsp;
+<BR>
+<BR>It is possible to get full duplex features by using two separate devices.
+In context of OSS this is not called full duplex but simultaneous use of
+two devices.&nbsp;
+<BR>
+<BR><B>Full duplex does _NOT_ mean that the same device can be used twice.</B>
+With current OSS it is not possible to open device that is already open.
+This feature can possibly be implemented in future versions. In this kind
+of situations you will need to use two separate devices.&nbsp;
+<BR>
+<BR>Some applications require full duplex operation. It is important that such
+applications verify that full duplex is possible (using <TT><A HREF="#getcaps">DSP_CAP_DUPLEX</A></TT>)
+before trying to use the device. Otherwise behaviour of the application
+will be unpredictable.&nbsp;
+<BR>
+<BR><FONT COLOR="#000000">Application should switch the full duplex feature
+on <B>immediately</B> after opening the device using <TT>ioctl(audiofd,
+SNDCTL_DSP_SETDUPLEX, 0)</TT>. This call switches the device to full duplex
+mode and makes the driver to be prepared for full duplex access. This must
+be done <B>before</B> checking the <TT>DSP_CAP_DUPLEX</TT> bit since otherwise
+the driver may report that the device doesn't support full duplex.</FONT>&nbsp;
+<BR>
+<BR><FONT COLOR="#000000">Using full duplex is simple in theory. The application
+just:</FONT>&nbsp;
+
+<UL>
+<LI>
+<FONT COLOR="#000000">Opens the device.</FONT></LI>
+
+<LI>
+<FONT COLOR="#000000">Turns on full duplex</FONT></LI>
+
+<LI>
+<FONT COLOR="#000000">Sets fragment size if necessary</FONT></LI>
+
+<LI>
+<FONT COLOR="#000000">Sets number of channels, sample format and sampling
+rate</FONT></LI>
+
+<LI>
+<FONT COLOR="#000000">Starts reading and writing the device</FONT></LI>
+</UL>
+<FONT COLOR="#000000">In practice it is not that simple. The application
+should be able to handle both input and output right in time (without blocking
+on writes and reads). </FONT>This almost certainly means that the application
+must be implemented to use the <A HREF="#syncro">synchronization methods</A>
+described earlier.&nbsp;
+<BR>
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+
+<TR ALIGN=LEFT VALIGN=TOP>
+<TD>
+<H3>
+<A NAME="mmap"></A>Accessing DMA buffer directly</H3>
+</TD>
+
+<TD>In some (rather rare) cases it is possible to map audio device's hardware
+level buffer area into the address space of an application. This method
+is very operating system dependent and it is currently available only in
+Linux. To for more info about this method (in Linux) you should look at
+a <A HREF="ftp://ftp.4front-tech.com/ossfree/mmap_test.c">demonstration
+program</A> provided by 4Front Technologies.&nbsp;
+<BR>
+<BR>The direct mapping method is possible only with devices that have a hardware
+level buffer which is directly accessible from host CPU's address space
+(for example a DMA buffer or a shared memory area).&nbsp;
+<BR>
+<BR>The basic idea is simple. The application uses an operating system dependent
+method to map the input or the output buffer into it is own virtual address
+space. In case of full <A HREF="#fulldup">duplex devices</A>, there are
+two separate buffers (one for input and one for output). After that it
+<A HREF="#trigger">triggers</A> the desired transfer operation(s). After
+that the buffer will be continuously accessed by the hardware until the
+device is closed. The application can access the buffer area(s) using pointers
+but normal read() and write() calls can no longer be used.&nbsp;
+<BR>
+<BR>The buffer area is continuously scanned by the hardware. When the pointer
+reaches the end of the buffer, the pointer is moved back to the beginning.
+The application can read and write the data using the <TT><A HREF="#getxptr">SNDCTL_DSP_GETxPTR</A></TT>
+calls. The <TT>bytes</TT> field tells how many bytes the device has processed
+since beginning. The <TT>ptr</TT> field gives an offset relative from the
+beginning of the buffer. This pointer must be aligned to nearest sample
+boundary before accessing the buffer using it. The pointer returned by
+this call is not absolutely precise due to possible delays in executing
+the ioctl call and possible FIFOs inside the hardware device itself. For
+this reason the application should assume that the actual pointer is few
+samples ahead the returned value.&nbsp;
+<BR>
+<BR>When using direct access the <TT>blocks</TT> field returned by the <TT>SNDCTL_DSP_GETxPTR</TT>
+calls has special meaning. The value returned in this field is number of
+fragments that have been processed since previous call to the same ioctl
+(the counter is cleared after the call).&nbsp;
+<BR>
+<BR>Also <TT>select</TT>() works in special way with mapped access. Select
+returns a bit in the <TT>readfds</TT> or <TT>writefds</TT> parameter after
+each interrupt generated by the device. This happens when the pointer moves
+from a buffer fragment to another. However the application should check
+the actual pointer very carefully. It is possible that the select call
+returns relatively long time after the interrupt. It is even possible that
+another interrupts occur before the application gets control again.&nbsp;
+<BR>
+<BR>Note that the playback buffer is never cleaned by the driver. If the application
+stops updating the buffer, its present contents will be played in loop
+again and again. Sufficient play-ahead is recommended since otherwise the
+device may play uninitialized (old) samples if there are any performance
+problems.&nbsp;
+<BR>
+<BR>No software based sample format conversions are performed by the driver.
+For this reason the <A HREF="audio.html#sample_format">application must
+use a sample format that is directly supported by the driver</A>.&nbsp;
+<BR>
+<HR width="100%">
+</TD>
+</TR>
+</TABLE>
+<CENTER>
+<A HREF="audio.html">
+<IMG SRC="../gifs/back.gif" ALT="Back to audio" HSPACE=5 VSPACE=5 BORDER=0 HEIGHT=59 WIDTH=57 ALIGN=ABSCENTER></A>
+<A HREF="audio.html">Audio programming</A>
+<A HREF="index.html">
+<IMG SRC="../gifs/menu.gif" ALT="Menu" HSPACE=5 VSPACE=5 BORDER=0 HEIGHT=58 WIDTH=54 ALIGN=ABSCENTER></A>
+<A HREF="index.html">Guide Menu</A>
+<A HREF="midi.html"><IMG SRC="../gifs/front.gif" ALT="Next" HSPACE=5 VSPACE=5 BORDER=0 HEIGHT=59 WIDTH=60 ALIGN=ABSCENTER></A>
+<A HREF="midi.html">MIDI programming</A>&nbsp;</CENTER>
+
+
+</BODY>
+</HTML>

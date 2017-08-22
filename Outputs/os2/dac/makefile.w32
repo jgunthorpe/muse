@@ -1,0 +1,22 @@
+PLATFORM = OS2
+$+
+CPPINC = $(OS2KIT)\H
+$-
+!include ..\..\..\makedefs.w32
+
+all: $(PLIBDIR)\DAC.lib
+
+OBJS = $(OUTDIR)\MMPM2.obj $(OUTDIR)\DART.obj
+
+$(PLIBDIR)\DAC.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\MMPM2.obj: MMPM2.cpp $(SDH)\MMPM2.hc $(SDH)\DAC.hc
+
+$(OUTDIR)\DART.obj: DART.cpp $(SDH)\DART.hc $(SDH)\DAC.hc
+
+$(SDH)\MMPM2.hc: MMPM2.hc
+   $(CPHC)
+
+$(SDH)\DART.hc: DART.hc
+   $(CPHC)

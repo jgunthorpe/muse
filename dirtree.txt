@@ -1,0 +1,107 @@
+File Key:
+  *.cpp - Compilable C code
+  *.h - General header
+  makefile.gmk - GNU Make make file
+  
+Compiler Invokations
+   Watcom C++ (All other targets)
+      wmake -f makefile.w32         (Library Compile)
+      wmake -f makefile.w32 DOS4G=  (DOS EXE Target)
+      wmake -f makefile.w32 OS2=    (OS2 EXE Target, Default)
+   GCC (linux)
+      ./makefile.gmk (binary|clean|veryclean|depends)
+      
+  Interestingly enough, the only variance between targets is in the link
+  phase where different libraries and targets are chosen, all the fileformats
+  are target neutral.
+
+  The header files are all copied to the dir include to adviod having to
+  include every single sub-directory in the program. When make veryclean is 
+  issued the copies in include are erased. The version in the source 
+  directories are the latest and greatest.
+
+Portability
+  As of this writing Muse compiles in OS/2 with Watcom C++ 10.0/10.6 with
+  the Warp Toolkit for certain. High C++ with som support DID at one
+  time work, but I have decided to expunge all support for native DTS from
+  the code, it has proved to be a bit of a hassle.
+  
+  Watcom C++ can also compile a Dos4G version that is linked with the file
+  output routines (WAV, Raw etc). No DOS drivers for sound cards have been
+  made, this would require writing a threads library for dos <ik>
+  
+  NT (Win32) Was considered but nothing came of it.
+  
+  The player was originaly constructed using Direct-To-SOM C++ (DTS) which
+  gave the resulting binaries indepenadance. This was dropped due to bugs
+  in HC and the general slow compile times that HC got on my 486. However,
+  the MetaClass-Class mechanism that SOM uses has persisted throughout the
+  code. It provides the kind of ICC I desire. Please see info.txt for
+  more info on how this is done in C++.
+
+  Also, since in some cases (OS, DOS + Win95) The sources can be built to
+  mulitple targets without any code changes there are various directories
+  for the output of object files and libaries in each sub dir.
+  
+Muse
+ |---- bino (OS/2 C++ Binaries)
+ |---- bind (DOS C++ binaries)
+ |---- binnt (NT C++ Binaries)
+ |---- BaseSet (Digital Mixer, BaseClasses and Class Registration)
+ |   |+ HandLst, HandlersList (Class Registration)
+ |   |+ DAC, Mixer*, Filter (Digital Mixer)
+ |   |+ FormatBs, FormatBase (Base class for file formats)
+ |   |+ OutputBs, OutputBase (Base class for output classes)
+ |
+ |---- include (Muse C++ Lib headers)
+ |
+ |---- Test (Test programs)
+ |   |---- DACTest (OS/2 Based test program)
+ |   |---- ltest (linux test program)
+ |
+ |---- Formats (The file formats)
+ |   |---- 669  (Composed [?] modules)
+ |   |---- DMF  (Incomplete, do not use)
+ |   |---- FAR  (Farandole Composer)
+ |   |---- info (All Info about all file formats)
+ |   |---- IT   (Impulse Tracker, working but buggy)
+ |   |---- MOD  (MOD, MTM, WOW)
+ |   |---- PTM  (Polytracker)
+ |   |---- S3M  (Scream Tracker 3)
+ |   |---- ULT  (Ultratracker)
+ |   |---- XM   (Fasttracker)
+ |
+ |---- Lib (Library Files
+ |   |---- NT  (Watcom 32 bit Link Libraries, NT Output devices)
+ |   |---- DOS (Watcom 32 bit Link Libraries, DOS Output devices)
+ |   |---- OS2 (Watcom 32 bit Link Libraries, OS/2 Output devices)
+ |   |---- W32 (Watcom 32 bit Link Libraries)
+ |   |---- SOM (OS/2 SOM Import Libraries [HC])
+ |
+ |---- Outputs (The Output Devices)
+ |   |---- OS2 (OS/2 Output devices)
+ |       |---- GUS (Manley/Sander GUS driver support)
+ |       |---- DAC (DART and MMPM2)
+ |   |---- DOS (DOS Output devices)
+ |       |---- Template (Template for a DAC output driver)
+ |   |---- NT (NT Output devices)
+ |   |---- File (WAV/RAW/AU File Output)
+ |   |---- Mixers (DAC Mixers)
+ |       |+ This contains the 2 primary Muse digital mixers
+ |       |---- Filters (DAC Filter classes)
+ |           |+ This is were the post output filter classes are stored
+ |
+ |---- Utils (C++ SOM Emulation calls and other goodies)
+ |   |+ IDLSequence The array class used extensivly in the program
+ |   |+ DebugUtils Debugging aide
+ |   |+ SOM Base classes
+ |   |+ Min/Max definitions
+ |
+ |---- UI (All of the UI programs)
+ |   |---- OS2 (OS/2 hosted UIs)
+ |       |---- PM (An Idea that went noplace very quickly)
+ |       |---- Text (Muse2txt, the beloved Text UI)
+ |   |---- Utils (Stuff)
+ |   |+ These are my experimental songlist handling routines, insanely
+ |   |+ powerfull, but not too usefull I fear ;>
+ |   |---- Play (OS/2 program to output stdin to the DAC using Muse's drivers)

@@ -1,0 +1,427 @@
+дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+DELUSION DIGITAL MUSIC FORMAT  -  rev 0.25 (10/6/94)
+дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+
+Beschreibung des DELUSION DIGITAL MUSIC FORMAT Fileversion 8.
+Die Dateikennung ist ".DMF".
+
+Alle fr│heren DDMF Versionen sind Betaformate und sollten nicht weiter
+benutzt werden, Xtracker 1.0 l└dt alle Vorg└nger Versionen korrekt und
+speichert sie als Version 8 ab.
+
+
+Das DDMF Format ist in folgenden Bl■cke unterteilt:
+
+[DDMF] Format Kennzeichnung
+[INFO] reserviert
+[CMSG] Text Mitteilungen
+[SEQU] Sequencer, Abspielreihenfolge der Pattern
+[PATT] Patterndaten
+[INST] reserviert
+[SMPI] Defintionen der Samples.
+[SMPD] Daten der Samples. MuА hinter dem SMPI Block gespeichert sein.
+[ENDE] Endmarkierung des DDMFs
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё DDMF Header                                                          Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Fileoffset Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё ID                                         Ё 4 Chars    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Filekennung ist "DDMF"                                               Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 4h         Ё FILE VERSION                               Ё 1 Byte     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё DDMF Fileversion, diese Beschreibung gilt nur f│r Version 8.         Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 5h         Ё TRACKER NAME                               Ё 8 Chars    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Name des benutzten Trackers.                                         Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 0dh        Ё SONG NAME                                  Ё 30 Chars   Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Name des Musikst│ckes, nicht benutzte Zeichen sollten auf 0 stehen.  Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 2bh        Ё COMPOSER NAME                              Ё 20 Chars   Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Name des Komponisten, nicht benutzte Zeichen sollten auf 0 stehen.   Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 3fh        Ё DATE                                       Ё 3 Bytes    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Erstellungsdatum: je ein Byte Tag, Monat, Jahr+1900                  Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё CMSG Block: Mitteilungen                                             Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Blockoffs. Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё BLOCKID                                    Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Blockkennung "CMSG"                                                  Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 4h         Ё BLOCKLENGTH                                Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё L└nge in Bytes bis zum n└chsten Block.                               Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 8h         Ё FILLER                                     Ё 1 Byte     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё reserviert                                                           Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 9h         Ё MESSAGE                                    Ё Chars      Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё ASCII-Text mit einer festen Zeilenl└nge von 40 Zeichen.              Ё
+Ё L└nge von MESSAGE = (BLOCKLENGTH - 1) Bytes.                         Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё SEQU Block: Sequencer, Abspielreihenfolge der Pattern                Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Blockoffs. Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё BLOCKID                                    Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Blockkennung "SEQU"                                                  Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 4h         Ё BLOCKLENGTH                                Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё L└nge in Bytes bis zum n└chsten Block.                               Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 8h         Ё SEQUENCER LOOP START                       Ё 1 Word     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Sequencer Schleifenanfang                                            Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 0ah        Ё SEQUENCER LOOP END                         Ё 1 Word     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Sequencer Schleifenende                                              Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 0ch        Ё SEQUENCER                                  Ё Words      Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Liste der Patternnummern die nacheinander abgespielt werden.         Ё
+Ё L└nge von SEQUENCER = (BLOCKLENGTH - 4) Bytes                        Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё PATT Block: Patterndaten                                             Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Blockoffs. Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё BLOCKID                                    Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Blockkennung "PATT"                                                  Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 4h         Ё BLOCKLENGTH                                Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё L└nge in Bytes bis zum n└chsten Block.                               Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 8h         Ё PATTERN ENTRIES (1-1024)                   Ё 1 Word     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Anzahl der gespeicherten Pattern.                                    Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 0ah        Ё MAX TRACKS (1-32)                          Ё 1 Byte     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Anzahl der der maximal benutzten Tracks.                             Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 0bh        Ё PATTERNS                                   Ё Words      Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Folgende Struktur PATTERN ENTRIES mal wiederholt                     Ё
+Ёзддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Patternoff.Ё Bezeichner                                Ё Datentyp   Ё
+Ёцддддддддддддедддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+ЁЁ 0h         Ё TRACK ENTRIES (1-1024)                    Ё 1 Byte     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Anzahl der gespeicherten Tracks in diesem Pattern.                  Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ 1h         Ё BEAT                                      Ё 1 Byte     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ BEAT = xxxxyyyy                                                     Ё
+ЁЁ        ЁЁЁЁюааад reserviert                                         Ё
+ЁЁ        юаааддддд Notenzeilen pro Beatschlag                         Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ 2h         Ё TICK ENTRIES                              Ё 1 Word     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Anzahl der gespeicherten Notenzeilen in diesem Pattern              Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ 4h         Ё PATTERNLENGTH                             Ё 1 Dword    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ L└nge der Patterndata, Bytes bis zum n└chsten Pattern.              Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ 6h         Ё PATTERDATA                                Ё Bytes      Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Der Patterndatenstrom ist folgendermassen codiert:                  Ё
+ЁЁ                                                                     Ё
+ЁЁ Folgende Struktur TICK ENTRIES mal wiederholt                       Ё
+ЁЁздддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁЁЁ <GLOBAL TRACK> (<TRACK> * TRACK ENTRIES)                           Ё
+ЁЁцдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁЁЁ GLOBAL TRACK                                                       Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INFO          1 Byte                                              Ё
+ЁЁЁ  (COUNTER)     1 Byte                                              Ё
+ЁЁЁ  (DATA)        1 Byte                                              Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INFO = xxxxxxxx                                                   Ё
+ЁЁЁ         ЁЁЁЁЁЁЁЁ                                                   Ё
+ЁЁЁ         ЁЁюааааад Global Track Ereigniss                           Ё
+ЁЁЁ         Ёюддддддд reserviert                                       Ё
+ЁЁЁ         юдддддддд Pack                                             Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  Falls Pack=1 ist das n└chst gelesene Byte COUNTER.                Ё
+ЁЁЁ  COUNTER ist ein Z└hler der jede Notenzeile herunter gez└hlt wird, Ё
+ЁЁЁ  es sind keine GLOBAL Track Informationen gespeichert bis COUNTER  Ё
+ЁЁЁ  wieder auf 0 steht. COUNTER wird bei einem Patternwechsel auf 0   Ё
+ЁЁЁ  gesetzt. Ist Pack=0 so ist kein COUNTER gespeichert und f│r       Ё
+ЁЁЁ  COUNTER gilt der Wert 0, d.h. im n└chsten Tick ist wieder ein     Ё
+ЁЁЁ  GLOBAL TRACK gespeichert.                                         Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  Falls Global Track Ereigniss > 0 ist folgt ein weiters Byte DATA, Ё
+ЁЁЁ  das die Effektdaten f│r den zugeh■rige Ereigniss liefert. Ist das Ё
+ЁЁЁ  Global Track Ereigniss = 0 ist DATA nicht gespeichert.            Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  Definition der Global Track Ereignisse siehe DMF_EFF.TXT          Ё
+ЁЁЁ                                                                    Ё
+ЁЁцдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁЁЁ TRACK                                                              Ё
+ЁЁЁ дддддд                                                             Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INFO                 1 Byte                                       Ё
+ЁЁЁ  (COUNTER)            1 Byte                                       Ё
+ЁЁЁ  (INSTRUMENT)         1 Byte                                       Ё
+ЁЁЁ  (NOTE)               1 Byte                                       Ё
+ЁЁЁ  (VOLUME)             1 Byte                                       Ё
+ЁЁЁ  (INSTRUMENT EFFECT)  2 Bytes                                      Ё
+ЁЁЁ  (NOTE EFFECT)        2 Bytes                                      Ё
+ЁЁЁ  (VOLUME EFFECT)      2 Bytes                                      Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INFO                                                              Ё
+ЁЁЁ  ддддд                                                             Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INFO = xxxxxxxx                                                   Ё
+ЁЁЁ         ЁЁЁЁЁЁЁЁ                                                   Ё
+ЁЁЁ         ЁЁЁЁЁЁЁx reserviert                                        Ё
+ЁЁЁ         ЁЁЁЁЁЁ1=VOLUME EFFECT gespeichert / 0=nicht gespeichert    Ё
+ЁЁЁ         ЁЁЁЁЁ1=NOTE EFFECT gespeichert / 0 ...                     Ё
+ЁЁЁ         ЁЁЁЁ1=INSTRUMENT EFFECT gespeichert / 0 ...                Ё
+ЁЁЁ         ЁЁЁ1=VOLUME gespeichert / 0 ...                            Ё
+ЁЁЁ         ЁЁ1=NOTE gespeichert / 0 ...                               Ё
+ЁЁЁ         Ё1=INSTRUMENT gespeichert / 0 ...                          Ё
+ЁЁЁ         1=COUNTER gespeichert / 0 ...                              Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  Folgende Werte sind also nur gespeichert wenn die entsprechenden  Ё
+ЁЁЁ  Bits in INFO gesetzt sind, wenn nicht bedeuted das keine ▌nderung Ё
+ЁЁЁ  des entsprechenden Parameters.                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  COUNTER                                                           Ё
+ЁЁЁ  дддддддд                                                          Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  COUNTER ist ein Z└hler der jeden Tick herunter gez└hlt wird, es   Ё
+ЁЁЁ  sind keine Informationen f│r diesen Track gespeichert bis COUNTER Ё
+ЁЁЁ  wieder auf 0 steht. COUNTER wird bei einem Patternwechsel auf 0   Ё
+ЁЁЁ  gesetzt. Ist COUNTER nicht gespeichert so gilt f│r COUNTER der    Ё
+ЁЁЁ  Wert 0, d.h. f│r die n└chsten Notenzeilen sind wieder Daten f│r   Ё
+ЁЁЁ  diesen Track gespeichert.                                         Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INSTRUMENT                                                        Ё
+ЁЁЁ  ддддддддддд                                                       Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  Die Samplenummer des Samples das Angeschlagen wird.               Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  NOTE                                                              Ё
+ЁЁЁ  ддддд                                                             Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ   0       = Keine ▌nderung                                         Ё
+ЁЁЁ   1-108   = Note in Halbtonschritten,  C0=1 bis H8=108.            Ё
+ЁЁЁ             Dies entspricht einer Midi Note mit 1 addiert.         Ё
+ЁЁЁ   109-128 = Nicht definiert                                        Ё
+ЁЁЁ   129-236 = Die Note wird in den Notenpuffer gespeichert und nicht Ё
+ЁЁЁ             gespielt, eine spielende Note wird nicht ver└ndert.    Ё
+ЁЁЁ             Das MSBit wird gel■scht die Noten entsprechen dann den Ё
+ЁЁЁ             Noten 1-108.                                           Ё
+ЁЁЁ             Der Notenpuffer wird als 2 Parameter f│r Noten-Effekte Ё
+ЁЁЁ             verwendet z.B. f│r Note Portamentos, wo die Effekt-    Ё
+ЁЁЁ             daten schon f│r den Steigungsgrad vergeben sind.       Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ   237-254 = Nicht definiert                                        Ё
+ЁЁЁ   255     = Note Off, setzt die Notenfrequenz auf 0 hz             Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  VOLUME                                                            Ё
+ЁЁЁ  ддддддд                                                           Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ   0     = Nicht definiert                                          Ё
+ЁЁЁ   1-255 = Neue Lautst└rke des Tracks, lineare Skalierung           Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  INSTRUMENT EFFECT                                                 Ё
+ЁЁЁ  дддддддддддддддддд                                                Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ   1.Byte: Instrument Effekt Nr.                                    Ё
+ЁЁЁ   2.Byte: Instrument Effekt Daten                                  Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  NOTE EFFECT                                                       Ё
+ЁЁЁ  дддддддддддд                                                      Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ   1.Byte: Noten Effekt Nr.                                         Ё
+ЁЁЁ   2.Byte: Noten Effekt Daten                                       Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  VOLUME EFFECT                                                     Ё
+ЁЁЁ  дддддддддддддд                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ   1.Byte: Volume Effekt Nr.                                        Ё
+ЁЁЁ   2.Byte: Volume Effekt Daten                                      Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ                                                                    Ё
+ЁЁЁ  Definition der Volume,Noten,Instrument Effekte in DMF_EFF.TXT     Ё
+ЁЁЁ                                                                    Ё
+ЁЁюдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+Ёюддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё SMPI Block: Sample Defintionen                                       Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Blockoffs. Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё BLOCKID                                    Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Blockkennung "SMPI"                                                  Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 4h         Ё BLOCKLENGTH                                Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё L└nge in Bytes bis zum n└chsten Block.                               Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 8h         Ё SAMPLE ENTRIES (1-255)                     Ё 1 Word     Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё  Anzahl der gespeicherten Samples, maximal 255.                      Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 6h         Ё SAMPLES                                    Ё Bytes      Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Folgende Struktur SAMPLE ENTRIES mal wiederholt                      Ё
+Ёзддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Sampleoff. Ё Bezeichner                                Ё Datentyp   Ё
+Ёцддддддддддддедддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+ЁЁ 0h         Ё Y = NAME LENGTH (0-30)                    Ё 1 Byte     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ L└nge des Samplenamens, die L└nge des ist auf maximal 30 Zeichen    Ё
+ЁЁ beschr└nkt.                                                         Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ 1h         Ё SAMPLE NAME                               Ё X Chars    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Name des Samples in ASCII Zeichen. L└nge des Namens ist NAME LENGTH Ё
+ЁЁ Zeichen.                                                            Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 1h     Ё SAMPLE LENGTH                             Ё 1 Dword    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ L└nge des Samples in Bytes.                                         Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 5h     Ё SAMPLE LOOP START                         Ё 1 Dword    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Sample Schleifen Start Position.                                    Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 9h     Ё SAMPLE LOOP END                           Ё 1 Dword    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Sample Schleifen End Position.                                      Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 0dh    Ё C3 FREQUENCY                              Ё 1 Word     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Frequenz, in Hz, mit der das Sample bei der Note C-3 gespielt wird. Ё
+ЁЁ Das Sample kann dadurch beliebig gestimmt werden. G│ltiger Bereich  Ё
+ЁЁ f│r C3 FREQUENCY ist 1000-45000 Hz.                                 Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 0fh    Ё VOLUME                                    Ё 1 Byte     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Samplelautst└rke.                                                   Ё
+ЁЁ                                                                     Ё
+ЁЁ VOLUME = 0 kein Auswirkung                                          Ё
+ЁЁ          1-255 Lautst└rke, linearer Skalierung                      Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 10h    Ё TYPE                                      Ё 1 Byte     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ                                                                     Ё
+ЁЁ TYPE = xxxxxxx0   = kein Schleife                                   Ё
+ЁЁ        xxxxxxx1   = Sample wird mit einer Schleife gespielt, das    Ё
+ЁЁ                     Sample spielt vom Start bis SAMPLE LOOP END und Ё
+ЁЁ                     wiederholt danach den Bereich von SAMPLE LOOP   Ё
+ЁЁ                     START bis SAMPLE LOOP END.                      Ё
+ЁЁ        xxxxxx0x   = 8BIT Sample                                     Ё
+ЁЁ        xxxxxx1x   = 16BIT Sample                                    Ё
+ЁЁ        xxxxXXxx   = Kompremierungsverfahren                         Ё
+ЁЁ        xxxx00xx   = Unkompremiert vorzeichenbehaftet                Ё
+ЁЁ        xxxx01xx   = Kompremierungs Typ0                             Ё
+ЁЁ        xxxx10xx   = (Kompremierungs Typ1)                           Ё
+ЁЁ        xxxx11xx   = (Kompremierungs Typ2)                           Ё
+ЁЁ        xXXXxxxx   = nicht Definiert                                 Ё
+ЁЁ        0xxxxxxx   = --> Die Sampledaten sind im SMPD Block des DMFs Ё
+ЁЁ                     gespeichert.                                    Ё
+ЁЁ        1xxxxxxx   = --> Die Sampledaten sind in einer Biblothek     Ё
+ЁЁ                     gespeichert.                                    Ё
+ЁЁ                                                                     Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 11h    Ё LIBRARY NAME                              Ё 8 Byte     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Biblotheks Kennzeichnung unter der das Sample zu finden ist.        Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 19h    Ё FILLER                                    Ё 1 Word     Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ reserviert                                                          Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Y + 1bh    Ё ID CRC32                                  Ё 1 DWord    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Pr│fsumme der Sampledaten.                                          Ё
+Ёюддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё SMPD Block: Sample Daten                                             Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Blockoffs. Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё BLOCKID                                    Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Blockkennung "SMPD"                                                  Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 4h         Ё BLOCKLENGTH                                Ё 1 Dword    Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё L└nge in Bytes bis zum n└chsten Block.                               Ё
+цддддддддддддбддддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+Ё 8h         Ё SAMPLE DATA                                Ё Bytes      Ё
+цддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+Ё Folgende Struktur SAMPLE ENTRIES (SMPI) wiederholt                   Ё
+Ёзддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ Sampleoff. Ё Bezeichner                                Ё Datentyp   Ё
+Ёцддддддддддддедддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+ЁЁ 0h         Ё SAMPLE DATA LENGTH                        Ё 1 Dword    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ L└nge des Sampledatenstroms. Bei kompremierten Samples die L└nge    Ё
+ЁЁ des Samplepackstroms. Bei einem Sample das in einer Biblothek       Ё
+ЁЁ gespeichert ist steht SAMPLE DATA LENGTH auf 0.                     Ё
+Ёцддддддддддддбдддддддддддддддддддддддддддддддддддддддддддбдддддддддддд╢
+ЁЁ 4h         Ё SAMPLE DATA STREAM                        Ё X Bytes    Ё
+Ёцддддддддддддадддддддддддддддддддддддддддддддддддддддддддадддддддддддд╢
+ЁЁ Sampledatenstrom.                                                   Ё
+Ёюддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё ENDE Block: End-Markierung des DDMFs                                 Ё
+фммммммммммммяммммммммммммммммммммммммммммммммммммммммммммямммммммммммм╣
+Ё Blockoffs. Ё Bezeichner                                 Ё Datentyp   Ё
+цддддддддддддеддддддддддддддддддддддддддддддддддддддддддддедддддддддддд╢
+Ё 0h         Ё "ENDE"                                     Ё 1 Dword    Ё
+юддддддддддддаддддддддддддддддддддддддддддддддддддддддддддадддддддддддды
+
+

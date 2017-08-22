@@ -1,0 +1,13 @@
+PLATFORM = OS2
+!include ..\makedefs.w32
+
+all: $(BINDIR)\rawplay.exe
+
+OBJS = rawplay.obj
+LIBS = $(LIBDIR)\SOM.lib $(LIBDIR)\BaseSet.lib &
+       $(PLIBDIR)\mmpm2.lib $(PLIBDIR)\dac.lib
+
+
+$(BINDIR)\rawplay.exe: $(OBJS) $(LIBS)
+   echo Linking $^@
+   $(LINK) /k30000 $(OBJS) $(LIBS)

@@ -1,0 +1,18 @@
+PLATFORM = OS2
+!include ..\makedefs.w32
+
+all: $(BINDIR)\Test.exe
+
+OBJS = Test.obj
+LIBS = $(LIBDIR)\SOM.lib $(LIBDIR)\S3M.lib $(LIBDIR)\BaseSet.lib &
+       $(LIBDIR)\File.lib $(PLIBDIR)\DAC.lib $(PLIBDIR)\mmpm2.lib &
+       $(PLIBDIR)\GUSMixer.lib $(LIBDIR)\MOD.lib $(LIBDIR)\XM.lib &
+       $(LIBDIR)\IT.lib $(LIBDIR)\669.lib $(LIBDIR)\FAR.lib $(LIBDIR)\ULT.lib &
+       $(LIBDIR)\PTM.lib $(LIBDIR)\DMF.lib
+
+$(BINDIR)\Test.exe: $(OBJS) $(LIBS)
+   echo Linking $^@
+   $(LINK) /k30000 $(OBJS) $(LIBS)
+
+$(OUTDIR)\OutputBs.obj: OutputBs.cpp $(SDH)\OutputBs.hc
+

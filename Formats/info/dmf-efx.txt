@@ -1,0 +1,523 @@
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+DELUSION DIGITAL MUSIC EFFECTS V0.18á1 (25/12/93)
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+
+Oki sorry dudes, some effect stuff is still in German....
+English dox will be ready soon, no prob... but try thiz,
+for help call us.....
+
+
+GLOBAL TRACK
+ÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Nr.   Name                 DATA          Default
+
+0*  No Global Data          ---             ---
+
+
+1*  Set Tick Frame Speed   DATA             33
+
+Setzt die Anzahl der Ticks pro Sekunde auf (DATA/4)+1 Hz.
+Dadurch ist die Geschwindigkeit unabh„ngig vom aktuell gesetzten
+Beat.
+
+Put the amount of the ticks per second on (data/4)+1 hz. That way the 
+speed is not dependant upon the actual speed of the beat that was set 
+earlier.
+
+
+2*  Set BPM Speed          DATA            125
+
+Setzt die BPM Geschwindigkeit auf DATA in BPM.
+Die effektive Tickspeed ist abh„ngig vom momentan gesetztem Beat.
+Ist Beat=0 wird Tick Frame Speed bentzt.
+
+Put the bpm speed upon the data in bpm
+The effective tickspeed is dependant upon the earlier set beat.
+If beat=0 then the tick frame speed is used.
+
+Beats per Minute "BPM"
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Def.: TICK = eine Zeile im Pattern
+           = One line of the pattern 
+ 
+
+Def.: CLICK = ein Effekt Click. Clicks werden zwischen den Ticks ausgefhrt um
+              die Effekte zu "berechnen". Die Anzahl der Clicks wird vom
+              Player automatisch an die aktuelle Speed angepasst.
+            = effect click. clicks are being used to calculate the effects. 
+              the amount of ticks is automatically adjusted by the player to
+              fit in with the actual speed.
+
+
+Def.: BPM = Anzahl der Beats [Viertel Noten/Quarter Notes] in einer Minute.
+
+          = beats per minute, amount of quarter notes per minute  
+
+Bsp. 3 Beats Per Measure, 4 Ticks per Beat (=3/4 Takt)
+
+     ÚÄ       ÚÄ01 Tick (hier 1 Tick = 1/16 Note ((1/4 Note)/4 8-) )
+     ³        ³  .
+     ³        ³  . zwischen jedem Tick werden die Effect "Clicks"
+     ³        ³  . ausgefhrt
+     ³        ³  .
+  1  ³   BEAT ³ 02 Tick
+     ³        ³ 03  "
+  T  ³        ÀÄ04  "
+  A  ³        ÚÄ05
+  K  ³   BEAT ³ 06
+  T  ³        ³ 07
+     ³        ÀÄ08
+     ³        ÚÄ09
+     ³   BEAT ³ 10
+     ³        ³ 11
+     ÀÄ       ÀÄ12
+
+
+Bsp. Bei einem 3/4 Takt, 8 Ticks per Beat (1 Tick = 1/32 Note) mit 120 BPM
+     und 4 Effekt Clicks muss die Musik Routine mit:
+
+       (120 BPM * 8 Ticks * 4 Clicks) / 60 sec = 64 Hz aufgerufen werden.
+
+
+3*  Set Beat              HI³LOW           Pattern Header
+
+[HI Data] = Ticks per Beat
+[LOW Data] = Beats per Measure
+
+Hinweis: Jedes Pattern hat im Header einen default Beat gespeichert dieser
+         Effekt ver„ndert den Beat nur im aktuellen Pattern.
+
+Note: each pattern has a default beat speed, this effect only changes the 
+      speed within the actuall pattern.
+
+4*  Tick Delay            HI³LOW
+
+HI Data = Anzahl der Ticks die gewartet werden bis der n„chste Tick
+         "verarbeitet" wird.
+
+        = size of the waiting loop (in ticks) until the next tick has
+          been processed.
+
+LOW Data = 1/16 Ticks die gewartet werden bis zum n„chste Tick.
+          
+         = 1/16 ticks is here the amount of waiting time until the next tick.
+
+Die Effekte werden w„hrend der Pause nicht upgedated...
+
+Effects are not updating during these "waiting" periods.
+
+"Stotter Effekt" ;-)
+
+"Stuttering effect"
+
+5*  Set External Flag      DATA
+
+šbergibt DATA als external readable Flag
+
+Gives you DATA as an externally readable flag
+
+
+-   Set Global Volume
+
+-   Send Midi Command  DATA
+
+ Sendet DATA an ein Midi Device.
+
+ Sending DATA to a midi Device
+
+-   Slide Speed Up (TicksPerSecond/BPM)
+
+-   Slide Speed Down (TPS/BPM)
+
+-   Debug Flag (Stop die Music bis zu einem externen restart)
+
+               (Stops music output until an external restart)
+
+-   Set Filters
+
+(- Call External Function)
+
+
+
+INSTRUMENT EFFECTS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+0*  No Effect Data         ---             ---
+
+
+1*  Stop Sample            DATA
+
+Das Sample wird gestoppt. Unterschied zu Note Off das Sample spielt nicht
+weiter, gesetzte Noten nach dem Sample Stop sind nicht zu h”ren.
+
+Playing of a sample is halted. Difference between this and Note off is that 
+the sample is not being played until the end of the sample and notes after
+the sample stop are not being heared.
+
+(DATA gibt an wieviel 1/256 Ticks vez”gert wird bis das Sample gestoppt wird,
+ nicht implementiert, DATA=0 ! )
+
+( ^-- Next function is not yet implemented. DATA=0)
+
+2*  Stop Sample Loop
+
+L”scht das Loop Flag, das Sample klingt aus. Das Sample wird bis zu Sample
+Ende gespielt...
+
+Sample loop is terminated. Sample is played until the end of the sample.
+
+3*  Instrument Volume Override/  DATA
+    Restart Sample
+
+Spielt das Sample von vorne, unterschied zu einem normalen Sample Trigger ist
+daá das Instrument Volume nicht bernommen wird.
+Wenn eine Sample Nr. im Sample Slot steht wird dies "restartet", das Volume
+aber nicht auf Instrument Volume gesetzt.
+
+Playes a sample from the beginning. Differnce between this and a Sample trigger
+is that the Instrument volume is taken into account.
+
+Wird unter anderem ben”tigt um MOD Eintr„ge mit Note aber ohne Instrument Nr.
+zu konvertieren (z.b. Mayday_r.mod).
+
+Mainly used to convert certain notes withouth instruments (by example 
+Mayday_r.mod uses these)
+
+4*  Sample Delay/          HI Nibble³LOW Nibble
+    Trigger Sample
+
+[HI Nibble] = 1/16 Ticks
+[LOW Nibble] = not used
+
+HI Nibble gibt an wieviel 1/16 Ticks vez”gert wird bis das Sample getrigerd
+wird. Wenn kein Sample Nr. im Sample Slot steht wird das zuletzt gesetzte
+Sample Retriggerd.
+
+Hi nibble indicates how many 1/16 ticks the sample is delayed until the 
+sample is retriggered. When there is no sample number in the sample slot 
+then the last used sample is retriggered.
+
+5*  Tremolo Retrig Sample  HI Nibble³LOW Nibble
+    "Pro Tracker Retrig Note"
+
+[HI Nibble] = 1/16 Ticks
+[LOW Nibble] = not used
+
+Das Sample wird mit einer Periodenl„nge von HI Nibble/16 Ticks retriggert.
+Fr sehr schnelle Anschl„ge z.b. HiHats ;-)
+
+The sample is being retriggered with a periodiclenght of hi nibble/16.
+Best used for use of hihats and so on.
+
+6*  Set Sample Offset      DATA
+
+[DATA] = Sample Offset in 256 Byte Blocks
+
+Setzt das Sample Offset eines spielenden Samples auf die Position DATA*256.
+Falls der Wert gr”sser ist wie das Sample lang wird der Effekt ignoriert!
+Es k”nnen also nur die ersten 64 KB des Samples addressiert werden...
+wird vorerst ben”tigt um MOD Effekte zu konvertieren, sollte sp„ter durch
+einen sinnvolleren Parameter erneuert werden...
+
+Puts the sample offset of a sample that is being played on the position in-
+dicated by data*256. If the resulting value is larger then the lenght of the
+sample the effect is ignored. This results in only being able to adress the
+first 64kb of a sample.
+
+7*  Invert (Tekkkno) Sample play direction   DATA
+
+Invertiert die Spielrichtung des Samples. DATA muss 0 sein!
+
+Inverts the way the sample is being played. forward -> backwards.. etc..
+DATA has to be 0.
+
+{Future:
+DATA = 0 Sample Spielrichtung invertieren
+       
+       0 sample playing directions inverted      
+   
+       1 Sample von momentaner Position rckw„rts spielen
+       
+       1 sample is being played backwards from the position the sample is 
+         currently in.
+        
+       2 Sample  "       "         "    vorw„rts  spielen }
+
+       2 Sample is being played forwards from the position the sample is 
+         currently in.      
+   
+
+8   Rewind Sample          DATA
+
+  Invertiert Sample Abspielrichtung nur fr aktuellen Tick.
+
+   Inverts playing direction only for the actuall tick.
+
+-  Reffer B. (Reverb)
+
+-  Invert Sample
+
+  Spielt Sample von Hinten nach vorne, Loops werden auch herum gedreht.
+
+  Plays a sample backwards. loops are also taken into account.. 
+
+-  Distortion
+
+-  DJ Scratch
+
+  Scratched das Sample durch sehr schnelles vor und zurck spielen.
+
+  scracthing of samples by playing the samples forwards and backwards very
+  fast.
+
+-  Jump Around
+
+  Spielt randomm„ssig Sampleteile. Zap-Effekt
+   
+  plays parts of samples randomly.
+
+-  Tune Up Instrument
+
+  Verstimmt das Sample/Instrument
+  
+  retuning of a sample upwards.
+
+-  Tune Down Instrument
+
+  Verstimmt das Sample/Instrument
+
+  same as above only the other way..
+
+NOTE EFFECTS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+0*  No Effect Data         ---            ---
+
+
+1*  Note Finetune         SIGNED
+
+[SIGNED] = Note um +/- 1/128 Halbtonschritte fein einstellen
+
+           notes to finetune 1/128 halftones
+
+2*  Note Delay             DATA
+
+[DATA] = 1/256 Tick
+
+Der Notewert wird nach DATA/256 Ticks gesetzt. Die Note„nderung wird damit
+verz”gert. Eine Verz”gerung des Notenanschlags bewirkt "Sample Delay".
+
+notesvalues are now data/256 ticks. Notes changes are therefore delayed.
+A delay in note striking works as a sample delay.
+
+3*  Arpeggio              HI³LOW
+
+[HI Data] = Halbtonschritte, ber Grundnote
+[LOW Data] = Halbtonschritte, ber Grundnote
+
+Die Note wird schnell (jedem Effekt Click) zwischen Note, Note+HI Data und
+Note+LOW Data umgeschaltet.
+
+notes are played fast between note, note+hi data and note+low data.
+
+4*  Portamento Up          DATA             0
+
+Frequenz nach oben portamentieren [DATA] = 1/16 Halbtonschritte die bis
+zum n„chsten Tick nach oben geslidet werden.
+Die Portamento Up Grenze liegt bei C-9.
+
+freqeuncy is portamented up [data] = 1/16 halftones are being slided up to 
+the next tick. Max portamento up is c-9. 
+
+5*  Portamento Down        DATA             0
+
+Frequenz nach unten portamentieren [DATA] = 1/16 Halbtonschritte die bis
+zum n„chsten Tick nach unten geslidet werden.
+Die Portamento Down Grenze liegt bei C-0.
+
+same as above but down instead. so notes are being slided down.
+
+
+6*  Portamen to Note       DATA             0
+
+Frequenz in Richtung der letzt gesetzten "Buffer Note" sliden.
+[DATA] = 1/16 Halbtonschritte die bis zum n„chsten Tick geslidet werden.
+
+
+same as above but now notes are slided towards a 'buffer note'
+
+7*  Scratch to Note        DATA             ---
+
+DATA = MIDI Note Value
+
+Der aktuellem Notewert wird auf DATA bis zum Ende des aktuellen Ticks geslidet.
+Fr sehr schnelle slides ber mehrere Oktaven, die zwischenstuffen sind
+Halbtonschritte...
+
+the actaull note value is being slided until the end of the actuall tick. this
+slide can be taken over several octaves. the notes inbetween are halftones.
+
+8*  Vibrato Sin           HI³LOW           ---
+
+HI Data = Speed-1  Vibrato Periodenl„nge in Ticks
+
+          Speed-1  lenght of the vibrato period in ticks          
+
+          Bsp.: HI_Data=0 --> Speed 1, bedeuted:
+                1 Sinus durchlauf bis zum n„chsten Tick
+                HI_Data=4 --> Speed 5, bedeuted:
+                1/5 Sinus durchlauf bis zum n„chsten Tick
+
+LOW Data = Amplitude-1  Vibrato Amplitude in 1/8 Halbtonschritte
+
+           vibrate amplitude in 1/8 halftones            
+
+           Bsp.: LOW Data = 1 --> Amplitude=4, bedeuted:
+                 Amplitude=2*1/4 Halbtonschritt = 1/2 Halbtonschritt
+
+                 Die Grundnote wird mit +/- 1/2 Halbtonschritt ausgelenkt.
+
+                 (max. Amplitude = +/- 2 Halbtonschritte 8-) )
+
+
+9*  Vibrato /\/\          HI³LOW           ---
+
+Note wird mit einem Dreieck Signal moduliert.
+Effekt Parameter siehe Vibrato Sin.
+
+modulation of a note using a triangular signal.
+Effect parameters are the samw as with the vibrato.
+
+
+10  Vibrato Sqaure        HI³LOW           ---
+
+Note wird mit einem Rechteck Signal moduliert.
+Effekt Parameter siehe Vibrato Sin.
+
+Same as above but now a square signal is being used.
+
+11  Note Tremolo          HI³LOW           ---
+
+HI Data = Ticks/32 Anfangs Notenfrequenz
+LOW Data = Ticks/32 Note Off
+
+
+12* Note Cut              HI³LOW
+
+[HI] = 1/16 Ticks
+[LOW] = not used
+
+Die Note geht nach HI Nibble/16 Ticks auf Note Off.
+
+Notes goes after hi nibble/16 ticks into the note off stage.
+
+YO! YO! YO!
+ Die Vibrato, Tremolo und Arpeggio Speed sollten zus„tzlich ber eine feste
+ Frequenz (Notenfrequenzen) einstellbar werden. Da Speed Angaben ber Ticks
+ vom aktuellen Tickspeed abh„ngig sind ... fr eine harmonischere Modulation
+ w„hren feste Frequenzen besser.
+
+
+VOLUME EFFECTS
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+0*  No Effect Data         ---            ---
+
+
+1*  SlideUP               DATA            ---
+
+Volume wird nach oben portamentieren. DATA gibt an um wieviel Einheiten
+bis zum n„chsten Tick geslidet werden soll.
+
+volume is portamented upwards. DATA gives the amount of units that should
+be used for sliding until the next tick.
+
+
+2*  SlideDN               DATA            ---
+
+Volume wid nach unten portamentieren. (siehe SlideUP)
+
+same as above but now downwards.
+
+3   Volume Tremolo        DATA            ---
+
+HI Data = Ticks/32 Anfangs Volumewert
+LOW Data = Ticks/32 Volume muted
+
+
+4   Volume Vibrato Sin    HI Nibble³LOW Nibble
+    "MOD Tremolo"
+
+HI Nibble = Speed-1  Vibrato Periodenl„nge in Ticks
+
+          Bsp.: HI_Data=0 --> Speed 1, bedeuted:
+                1 Sinus durchlauf bis zum n„chsten Tick 8-)
+
+LOW Nibble = Amplitude-1  Vibrato Amplitude in (aktuelles Volume)/32 Einheiten
+
+             vibrato amplitude in (actuall volume/32) units.           
+
+             Bsp.: aktuelles Volume = 128
+                 LOW Data = 2 --> Amplitude=128/32*3=+/-12 Volumeeinheiten
+                 bedeutet:
+
+                 Die Lautst„rke wird zwischen 128 und 104 Einheiten mit
+                 einer Sinusschwingung moduliert.
+
+                 (max. von 0-255 8-) )
+
+
+5   Volume Vibrato /\/\   DATA
+
+HI Data = Ticks/4  Vibrato Periodenl„nge
+
+          Ticks/4 is the length of the vibrato period.
+
+LOW Data = Ticks Vibrato Amplitude
+
+
+6   Volume Vibrato Sqaure DATA             ---
+
+HI Data = Ticks/4  Vibrato Periodenl„nge
+ 
+          Ticks/4 is the length of the vibrato period. 
+
+LOW Data = Ticks Vibrato Amplitude
+
+
+7*  Set Balance           DATA
+
+DATA= 0=ganz Links, 255=ganz Rechts, 128=Mitte
+
+data=0, signal is left oriented. data=255, signal is right oriented.
+data=128, signal is evenly oriented over both speakers.
+
+
+8*  Slide Balance Left
+
+Balance wird nach links geslidet. DATA gibt an um wieviel Einheiten
+bis zum n„chsten Tick geslidet werden soll.
+
+Balance is slided to the left speaker. DATA gives the amount of units
+that need to be slided until the next tick.
+
+
+9*  Slide Balance Right
+
+Balance wird nach rechts geslidet. DATA gibt an um wieviel Einheiten
+bis zum n„chsten Tick geslidet werden soll.
+
+same as above but now to the right.
+
+10  Vibrato Balance Left/Right
+
+HI Data = Ticks/4  Vibrato Periodenl„nge
+LOW Data = Ticks Vibrato Amplitude
+
+
+* Effekte funktionsf„hig
+
+END.

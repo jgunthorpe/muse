@@ -1,0 +1,13 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\WaveTbl.lib
+
+OBJS = $(OUTDIR)\WaveTbl.obj
+
+$(LIBDIR)\WaveTbl.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\WaveTbl.obj: WaveTbl.cpp $(SDH)\WaveTbl.hc $(SDH)\OutputBs.hc
+
+$(SDH)\WaveTbl.hc: WaveTbl.hc
+   $(CPHC)

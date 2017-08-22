@@ -1,0 +1,137 @@
+# -*- make -*-
+# Makefile definitions for GCC under Linux
+
+# define locations of important dirs
+ifndef MUSE2BASE
+MUSE2BASE = $(wildcard ~/Muse)
+endif
+
+# Quick macros for use in the make files
+# SDH = Dir where the .h's go (copied from . to there, source files should
+#       always use #include <x.h>
+# LIBDIR = Dir were the library files go
+# OUTDIR = Dir were the object files go (a sub dir of .)
+SDH = $(MUSE2BASE)/include
+LIBDIR = $(MUSE2BASE)/lib/linux
+OUTDIR = linux
+BINDIR = $(MUSE2BASE)/binl
+STDLIBS += c g++ 
+
+# Compiler options
+CPPFLAGS += -I$(SDH)
+CXXFLAGS += -Wall -fno-implicit-templates -O2 -g
+
+# These are gnu make parsing macros. They expand to include paths and
+# whtever else is required.
+# DFILES expands to linux/<blah>.d
+DFILES = $(addsuffix .d,$(basename $(addprefix $(OUTDIR)/,$(SOURCE))))
+
+# OFILES expands to linux/<blah>.o
+OFILES = $(addsuffix .o,$(basename $(addprefix $(OUTDIR)/,$(SOURCE))))
+
+# Header files CPPHDrs/<blah>.h
+HFILES = $(addprefix $(SDH)/,$(HEADERS))
+
+# Lib Files
+LFILES = $(addsuffix .a,$(addprefix $(LIBDIR)/lib,$(LIBS)))
+
+# The library filename
+LIBNAME = $(LIBDIR)/lib$(LIBRARY).a
+
+# The program filename
+PROGNAME = $(BINDIR)/$(PROGRAM)
+
+# This generates the dependancy file for a given cpp file.
+$(OUTDIR)/%.d: %.cpp
+	echo Dependancy for $(notdir $<) 
+	$(CC) -M $(CPPFLAGS) $< > $@.t
+	echo "$(basename $@).o \\" > $@	
+	cat $@.t >> $@
+	rm $@.t
+
+# Copy rule for HC files
+$(SDH)/%.hc: %.hc
+	cp $< $@
+	
+# Copy rule for H files
+$(SDH)/%.h: %.h
+	cp $< $@
+
+# Compile rule for cpp files
+$(OUTDIR)/%.o: %.cpp
+	echo Compilng $< to $@
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+# Compile rule for cpp files, this we force the output to outdir
+# This is for use with my jed compile script whitch passes <blah>.o to
+# make and doesn't really care were the output goes. By forcing it we
+# don't break depends. Standard make commands should work 100% if this is
+# removed.
+%.o: %.cpp
+	echo Compilng $< to $@
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $(OUTDIR)/$@
+
+.PHONY: depends clean default library veryclean binary
+
+# We are building a library
+ifdef LIBRARY
+
+# General overall dependancies
+binary: library
+library: $(HFILES) $(LIBNAME)
+
+# Go nutz and purge like mad.
+veryclean: clean
+	-rm -f $(LIBNAME) 2> /dev/null
+	-rm -f $(HFILES) 2> /dev/null
+	
+# This constructs the library from it's .o files.
+$(LIBNAME): $(OFILES)
+	-rm -f $(LIBNAME) 2> /dev/null
+	echo Building library $(LIBNAME)
+	ar cq $(LIBNAME) $(OFILES)
+
+# Just silently ignore
+program:
+
+endif
+
+# We are building a program
+ifdef PROGRAM
+
+# General overall dependancies
+binary: program
+program: $(PROGNAME)
+
+# Go nutz and purge like mad
+veryclean: clean
+	-rm -f $(PROGNAME) 2> /dev/null
+
+# This constructs the program from it's .o files.
+$(PROGNAME): $(OFILES) $(LFILES)
+	echo Linking $@
+	$(CXX) -o $@ -L $(LIBDIR) $(OFILES) $(addprefix -l,$(LIBS))
+
+# Just silently ignore
+library:
+
+endif
+
+# Bad included makefile
+default:
+	echo Something is rather wrong.
+	
+# Create the dependancy information
+$(DFILES) : $(HFILES)
+depends: $(DFILES)
+
+# Remove output objects
+clean:
+	-rm -f linux/* 2> /dev/null
+
+# This will include compiler generated dependancies for the modules once
+# make depends has been run
+The_DFiles = $(wildcard linux/*.d)
+ifneq ($(words $(The_DFiles)),0)
+include $(The_DFiles)
+endif

@@ -1,0 +1,224 @@
+/* ########################################################################
+
+   GUSMixer - Class to allow Muse/2 to output a module to a GUS under OS/2
+              using the Manley GUS drivers
+
+   ########################################################################
+*/
+#include <Muse.h>
+
+#define INCL_DOS
+#include <os2.h>
+
+#include <stdio.h>
+#include <math.h>
+#include "ultradev.h"
+
+// Defined in a C module so it doesn't conform to normal manglings
+extern "C"{
+HFILE GUSHandle;
+}
+
+int PlayChan = 0;
+
+museGUSMixer::museGUSMixer()
+{
+}
+
+museGUSMixer::~museGUSMixer()
+{
+}
+
+void museGUSMixerClass::GetOptionHelp(SequenceString *)
+{
+}
+
+void museGUSMixer::SetOptions(char *S)
+{
+}
+
+string museGUSMixer::GetCurOptionDesc()
+{
+   char *C = (char *)SOMMalloc(300);
+
+   if (GUSHandle == 0)
+   {
+      sprintf(C,"");
+      return C;
+   }
+
+   int RamSize;
+   UltraSizeDram(&RamSize);
+   int K;
+   UltraGetDriverVersion(&K);
+
+   sprintf(C,"Driver Version %1.2f, %uK of GUS RAM",(float)(K/100.0),RamSize);
+   return C;
+}
+
+long museGUSMixer::Open(string *Error)
+{
+   DBU_FuncTrace("museGUSMixer","OpenGUS",TRACE_SIMPLE);
+   *Error = 0;
+
+   APIRET status;
+   ULONG action;
+   int k;
+
+   status = DosOpen( "ULTRA1$", &GUSHandle, &action, 0,
+			   FILE_NORMAL, FILE_OPEN, OPEN_ACCESS_READWRITE |
+            OPEN_SHARE_DENYNONE |
+            OPEN_FLAGS_WRITE_THROUGH |
+            OPEN_FLAGS_NOINHERIT, NULL);
+   somPrintf("GUSHandle is %u\n",(unsigned long)GUSHandle);
+
+   if (status != 0)
+   {
+      *Error = "Cannot open ULTRA1$ device, are the Manley drivers installed?";
+      return 1;
+   }
+
+   if (UltraGetAccess() != 0)
+   {
+      UltraReleaseAccess();
+   	DosClose(GUSHandle);
+   	*Error = "Cannot gain control of the device, another app has it";
+	   return 1;
+   }
+
+   if (UltraGetDriverVersion(&k) != 0)
+   {
+      UltraReleaseAccess();
+	   DosClose(GUSHandle);
+	   *Error = "Driver is too old, you must have at least V0.85";
+   	return 1;
+   }
+
+   if (k < 85)
+   {
+      UltraReleaseAccess();
+	   DosClose(GUSHandle);
+	   *Error = "Driver is too old, you must have at least V0.85";
+   	return FALSE;
+   }
+
+   Version = k;
+
+   LastTime = 0;
+   RealTime = TRUE;
+   return 0;
+}
+
+long museGUSMixer::CloseGUS()
+{
+   DBU_FuncTrace("museGUSMixer","CloseGUS",TRACE_SIMPLE);
+
+   // Force Sync to leave
+   CurrentTime = 0xFFFFFFFF;
+   DosPostEventSem(SyncSem);
+   StopNotes();
+   UltraReleaseAccess();
+   DosClose(GUSHandle);
+   return 0;
+}
+
+/* ########################################################################
+
+   Class - museGUSMixerClass (Class of museGUSMMPM2)
+   Member - Constructor (Inits the class)
+
+   Sets up the class.
+
+   ########################################################################
+*/
+museGUSMixerClass::museGUSMixerClass()
+{
+   DetectStatus = 0;
+   Level = 5;
+#ifdef CPPCOMPILE
+   MajorVersion = 1;
+   MinorVersion = 3;
+   museHandlerList::__ClassObject->AddOutput(this);
+#endif
+}
+
+/* ########################################################################
+
+   Class - museGUSMixerClass (Class of museGUSMMPM2)
+   Member - GetTypeName (Returns the name of this class)
+   IDL - string GetTypeName
+
+   Returns a pointer to a string containing 'Gravis UltraSound'.
+   This string is valid while the object exists.
+
+   ########################################################################
+*/
+string museGUSMixerClass::GetTypeName()
+{
+   return "Gravis UltraSound";
+}
+
+octet museGUSMixerClass::IsSupported()
+{
+   if (DetectStatus == 1)
+      return 0;
+   if (DetectStatus == 2)
+      return 5;
+
+   APIRET status;
+   ULONG action;
+   int k;
+
+   status = DosOpen( "ULTRA1$", &GUSHandle, &action, 0,
+			   FILE_NORMAL, FILE_OPEN, OPEN_ACCESS_READWRITE |
+            OPEN_SHARE_DENYNONE |
+            OPEN_FLAGS_WRITE_THROUGH, NULL);
+
+   if (status != 0)
+   {
+      DetectStatus = 1;
+      return 0;
+   }
+
+   if (UltraGetAccess() != 0)
+   {
+      UltraReleaseAccess();
+   	DosClose(GUSHandle);
+      DetectStatus = 1;
+      return 0;
+   }
+
+   if (UltraGetDriverVersion(&k) != 0)
+   {
+      UltraReleaseAccess();
+	   DosClose(GUSHandle);
+      DetectStatus = 1;
+      return 0;
+   }
+
+   if (k < 85)
+   {
+      UltraReleaseAccess();
+   	DosClose(GUSHandle);
+      DetectStatus = 1;
+      return 0;
+   }
+
+   UltraReleaseAccess();
+	DosClose(GUSHandle);
+   DetectStatus = 2;
+   return 5;
+}
+
+#ifndef CPPCOMPILE
+extern "C"
+{
+   void QueryOutputHandlers(IDLSequence<museOutputClass *> *);
+}
+
+void QueryOutputHandlers(IDLSequence<museOutputClass *> *List)
+{
+   List->construct();
+   (*List)[0] = (museOutputClass *)museGUSMixer::__ClassObject;
+}
+#endif

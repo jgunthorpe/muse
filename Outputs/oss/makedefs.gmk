@@ -1,0 +1,6 @@
+# -*- make -*-
+
+# Someday we might put something here
+
+REL := $(REL)/..
+include $(REL)/makedefs.gmk

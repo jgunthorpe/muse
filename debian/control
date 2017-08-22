@@ -1,0 +1,16 @@
+Source: muse
+Section: experimental
+Priority: optional
+Maintainer: "Jason Gunthorpe" <jgg@gpu.srv.ualberta.ca>
+Standards-version: 2.1.1.0
+
+Package: muse
+Essential: no
+Architecture: i386
+Depends: ${shlibs:Depends}
+Provides:
+Suggests:
+Description: Muse - Digital Module Player
+ Muse is a digital module player that outputs modules to an OSS compatible
+ /dev/dsp device. It supports the following formats:
+  S3M/MOD/IT/IT2/XM/MTM/WOW/PTM/FAR/669/STM and many MOD sub formats.

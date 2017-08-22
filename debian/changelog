@@ -1,0 +1,11 @@
+muse (1.4.0-2) unstable; urgency=low
+    
+  * S3M Bug fix
+
+ -- Jason Gunthorpe <jgg@gpu.srv.ualberta.ca>  Mon, 7 Apr 1997 21:42:13 -0600
+
+muse (1.4.0-1) unstable; urgency=low
+    
+  * Initial Linux release
+
+ -- Jason Gunthorpe <jgg@gpu.srv.ualberta.ca>  Mon, 7 Apr 1997 21:42:13 -0600

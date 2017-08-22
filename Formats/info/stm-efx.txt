@@ -1,0 +1,752 @@
+                      	   Scream Tracker
+
+
+                      <<<<< USERS MANUAL >>>>>
+
+
+                      (C) 1990 Sami Tammilehto
+		    
+		    
+==============================================================================
+
+
+        Contents by reference number:
+	
+1       The Scream Tracker enviroment
+1.1     The directory structure
+1.2     Using the program
+1.3     The piano keyboard
+1.4     The display
+1.5     Machine requirements
+1.6     Global commands
+1.7	Color setup
+2       Instruments
+2.1     What are they?
+2.2     Instrument disks
+2.2.1   What are they?
+2.2.2   Creating instrument disks
+2.2.3   The instrument disk 99
+2.3     Different parameters describing the instrument
+3       Setup
+3.1     Playing mode and speeds
+3.2     EditSound, Enable Timer and Instrument Disk Drive
+3.3     Directories
+4       Instrument Library
+4.1     What is it?
+4.2     Moving around in the instrument library
+4.3     The fields in the upper section.
+4.4     Commands specific to the Edit Library mode.
+4.5     Creating the instrument library
+4.5.1   Creating a library manually
+4.5.2   Easier creation way
+4.5.3   Adding separate samples easily
+5       Orders
+5.1     What are they?
+5.2     Editing orders
+5.3     Commands specific to Edit Orders
+6       Patterns
+6.1     What are they?
+6.2     Editing patterns
+6.3	Commands specific to Edit Patterns
+6.4     Special commands
+6.4.1   What are they?
+6.4.2   List of special commands
+7       Sample list
+7.1     What is it?
+7.2     Test fields and beat testing.
+7.3     List of commands
+8       Loading, saving and playing songs
+8.1     Loading a song/module
+8.2     Saving song/module
+8.3     Playing songs
+8.4     Infopage and status line info
+8.5     Scope
+8.6	Tracking and Recording
+8.7     Loading amiga modules
+
+
+==============================================================================
+
+
+1       The Scream Tracker enviroment
+
+1.1     The directory structure
+
+        The Scream Tracker is situated in it's own directory,
+        normally C:\ST. Under this parent directory you can
+        find files and directories used by Scream Tracker.
+        The SONG diretory contains the songs and modules
+        for the Scream Tracker. The STINS99 directory
+        acts as an instrument disk, which contains
+        the instruments stored on hard disk. The INS directory
+        is used for caching the instrument disks and
+        the ADD directory is used for adding new samples.
+
+1.2     Using the program
+
+        When you load the Scream Tracker (by executing ST.EXE)
+        you'll see the startup-screen. From this screen you
+        can go to the main menus by pressing left arrow key.
+        You can toggle menus fast with their hotkeys (the
+        capital letters) or move between them with cursor keys.
+        By pressing enter you can select the menu choice highlighted.
+        The three rightmost menus contain commands specific to
+        Edit Patterns, Edit Samples and Edit Library functions,
+        and the hotkeys shown in them apply only in each of
+        these edit modes, respectively. The other hotkeys can be
+        executed anytime (except in Dos Shell of course).
+
+1.3     The piano keyboard
+
+        The computers keyboard is divided into 2+ octaves and used
+        to emulate the common piano style keyboard. The octaves are
+        the following:
+	
+                    2 3   5 6 7   9 0
+        octave 2+: q w e r t y u i o p
+                    s d   g h j
+        octave 1:  z x c v b n m
+	
+        The keyboard is used when testing instruments or entering notes
+        to a pattern. Remark that the letters are small, not capital ones.
+	There's also a special beat entering keyboard:
+	
+	Q W E R T Y U I O P	- Uppercase (with SHIFT)
+	1 2 3 4 5 6 7 8 9 10	- These letters will play the sample shown
+				  here in C1. It's easy to make drum beats
+				  by putting the drums in the beginning of
+				  the sample list (<11 in number) and set
+				  their C2SPD:s so that C1 sounds good.
+				  Then you can enter the drums with
+				  the beat keyboard. The beat keyboard only
+				  functions in pattern editing. (you can
+				  use beat testing in Edit Samples)
+
+1.4     The display
+
+        The display is divided into four parts, of which the first one
+        tells the Scream Tracker version number and username (if ST is
+        registered).
+          The second part of the display is reserved for some often used
+        values, which define the lower pinao keyboard octave, default
+        sample, default volume, songs start tempo, songs name, current
+        pattern, Current channel, Global volume for the song, and finally
+        channel on/off status.
+          The third part, whose background is brown, is the editing area,
+        where all editing of the song is performed. It has several edit
+        screens, of which more is told later.
+          The last part is the bottomline, which acts as a statusline,
+        and displays things like loading, saving, and, while the music
+        is being played, the current position in song.
+
+1.5     Machine requirements
+
+	The Scream Tracker requires a fast machine. In this caes this
+	means at least an 8Mhz AT. 12Mhz at is suggested, for with
+	slower machines the PC-Speaker will function poorly. Although
+	Covox & SoundBlaster will work with 8Mhz machines with good
+	guality. The machine should NOT be slowed down by 386 specific
+	memory enhancement utilities using the VM86 mode. These include
+	QEMM, 386^MAX and Windows 3. If the sound seems to be too low
+	and it's pitch varies rapidly, the machine has not enough power.		
+	The VM86 products should be removed while using ST. Scream Tracker
+	also requires at least CGA to use scope. All other functions use 
+	text screens.
+
+
+1.6     Global commands
+
+        CTRL-D..This command shells to DOS. Remeber that if you leave the
+                music playing when shelling to dos, it might interfere with
+                programs run there
+        CTRL-W..Save (write) song
+        CTRL-L..Load song
+        CTLR-R..Load (retrieve) module
+        CTRL-A..Load amiga module
+        ALT-F1..Toggle channel 1 on/off
+        ALT-F2..Toggle channel 2 on/off
+        ALT-F3..Toggle channel 3 on/off
+        ALT-F4..Toggle channel 4 on/off
+        SH-F5...Play song. This (as all play commands)
+                also views the infopage
+        SH-F6...Play from current order. The current
+                order is the one the cursor is on in the
+                Edit order mode.
+        F6......Play current patter. The pattern will
+                be looped.
+        CTRL-Z..Play with scope. The scope requires CGA
+                or compatible display and also faster
+                machine than normal playing.
+	CTRL-T..Track song
+	CTRL-X..Record song
+        F5......Show infopage
+        F8......Stop playing
+        F7......Load instruments from disk. This function
+                is needed if the samples contained in
+                the Edit Samples list are modified. It's
+                not needed if only parameters are changed,
+                only when samples are removed or inserted.
+        F1......Edit Order
+        F2......Edit Patterns
+        F3......Edit Samples
+        F4......Edit Library
+        {.......Decrease global volume by 3
+        }.......Increase global volume by 3
+	
+1.7	Color setup
+
+	You can find the color setup in the 'Other' menu. When it's selected,
+	a window with colornames pops up and on the right side a hexadecimal
+	value for each color is shown. You can edit this value for quick
+	changes or press SPACE to select the color the cursor is on from
+	a palette. If you want your changes to take effect, exit color
+	setup with ENTER, otherwise press ESC.
+
+
+2       Instruments
+
+2.1     What are they?
+
+        The instruments are samples, which might be considered to
+        be sort of a record of a real instrument. To play the instrument
+        at different notes, it's speed is altered. Also a few other
+        values can be changed for an instrument. These include possible
+        looping and volume. Also vibrato and other special effects
+        can be used. The instruments are often quite long, about 10K
+        average, so it's best to store most of them on disks. Remark
+        that within this document and the program, the words sample
+        and instrument are both used interchangeably.
+
+2.2     Instrument disks
+
+2.2.1   What are they?
+
+        The Scream Tracker supports 99 instrument disks, of which
+        number 99 is the harddisk (and 00 undefined). The instrument disks
+        are used to store the samples (and ONLY the actual data, not
+        the parameters). In both the library and edit samples screen
+        you can specify the disk where a particular instrument can
+        be found. When loading an instrument, the ST first looks
+        for it in the cache directory, and if it's not found there,
+        ST will prompt for the correct disk (if it's defined). After
+        you have insterted the correct disk and pressed a key, the ST
+        will also transfer the sample to the cache directory, for faster
+        access.
+
+2.2.2   Creating instrument disks
+
+        Creating an instrument disk is a straightforward procedure.
+        You simple format a disk and make a following directory into
+        it's root: STINSxx where xx should be replaced with the instrument
+        disk number you are creating. (The samples stored to the disk will
+        then lie in the directory) Do not make several disks with the
+        same number, and remember that disks 00 and 99 should not be
+        made, for the numbers are used for different purposes in ST.
+
+2.2.3   The instrument disk 99
+
+        Instrument disk 99 differs from other instrument disk because
+        it's situated in the harddisk. It works just as a normal
+        disk, but it's instruments are NOT cached. It's automatically
+        created when ST is installed.
+
+2.3     Different parameters describing the instrument
+
+        Instrument parameters are shown in fields inside the ST. The fields
+        are named: File, C2SPD, Ds, Vl, LpBeg, LpEnd.
+        The first field descripbes the filename for the sample. The next
+        one is the speed (in Hz) at which the sample should be played so
+        that it would sound like C2 (mid C). The next field specifies the
+        instrument disk in which the sample can be found. The next value
+        is the default volume, the volume used when not otherwise specified.
+        The last two next fields describe the possible looping of the sample.
+        When the first value is 0 and the last 65535, no looping should be
+        performed. When the values differ from those, the last value defines
+        the byte at which the sample should be halted, and restarted at
+        byte defined by the first value. Inside ST these fields are often
+        followed by Test fields, which can be used for testing the instrument
+        with the piano keyboard.
+
+
+3       Setup
+
+3.1     Playing mode and speeds
+
+        You have currently four choises of hardware to play songs.
+        The one everyone has, is the PC-Speaker. The other options
+        include SoundBlaster, a PC sound card from Creative Lab's inc.
+        and Covox in LPT1/2. The term Covox means a device simply
+        acting as DA converter in printer port datalines.
+          The other important selection is machine speed. It theoretically
+        specifies how fast your machine is, so that the program can know
+        how good guality sound it can output. Generally 12Mhz is sufficient,
+        so in practice even if you have 33Mhz machine, it's better to keep
+        speed in 12Mhz, for there is practically no quality difference with
+        it and higher speeds. In addition when running sound at lower speed,
+        the machine will work faster while editing songs the same time they
+        are being played.
+	  The current version of ST also supports very slow speeds, down to
+	5Mhz, which may enable ordinary PC's to play songs. Although the 
+	quality is quite low, and these low speeds are only availible for
+	Covox and SoundBlaster.
+	  Note that you can select different speed for both the Scope and
+	normal Playing. It is strongly suggested that you use lower speed
+	for scope, for it needs more power.
+
+3.2     EditSound, Enable Timer and Instrument Disk Drive
+
+        If timer is not enabled, dos timer interrupt 8 will be masked off while
+        playing. It generally produces better sounds, especially with PC-
+        Speaker, but makes little difference with Covox or SoundBlaster.
+        The main advantage from keeping the Timer on is the fact DOS clock
+        will run in DOS shell (the machine keeps the time right when playing)
+        and disk drive motors will be stopped in time. (When timer is off,
+        the floppy disk drive motors run on forever after started)
+          The EditSound option tells the program whether or not play a note 
+	when it's written to a pattern. It's generally easier to make music 
+	when the option is on, but playing notes slow the machine down a bit.
+	  The Instrument Disk Drive specifies the drive into which you'll
+	insert the instrument disks when requested.
+
+3.3     Directories
+
+	You can specify five directories:
+	System directory contains the exe, help and libray files.
+	Instrument directory is used for instrument caching from disks.
+	Song directory is used to store songs and modules
+	Instrument disk 99 directory specifies the path for idisk 99,
+	  which should lie on the harddisk.
+	Add directory is the directory used for quick adding of samples
+	  to the library.
+
+4       Instrument Library
+
+4.1     What is it?
+
+        The instrument library is used to store the parameters of
+        instruments. It contains 99 usable sublibraries with 100
+        instruments each. In practice it means you can define 9900
+        instruments into the library. The library also provides
+        an easy way to select instruments when making a song. You
+        can write descriptions for each instrument, and then choose
+        the instruments for the song by descriptions. You can also
+        test instruments within the library, but it's often not
+        practical, for most instruments are probably on disks, so you'll
+        have to dig the correct instrument disks for testing...
+        The instrument library also contains a sublibrary called
+        clipboard (#99). Don't mix this clipboard with the one used
+        for copying stuff in the edit patterns mode. The clipboard
+        can be used for transferring and adding instruments to the
+        library. Remark that the clipboard is NOT saved to disk, so
+        it's emptied when you exit the program.
+
+4.2     Moving around in the instrument library
+
+        To get to the instrument library one must either press F4 or
+        select it from the edit menu. In the menu, the bright block
+        is your cursor, which can be moved with the cursor keys.
+        The screen is also divided into two parts. The lower displaying
+        the sublibraries, and the upper one contents of the current
+        sublibrary (one with grey background on the lower side). You
+        can toggle the sides with TAB key. In the lower side you can
+        edit the names of the sublibraries, and in the upper one, the
+        instruments contained in the instrument library.
+
+4.3     The fields in the upper section.
+
+        The upper section is divided into multiple fields, containing
+        the information about a sample. The first field from the left
+        is the description field. It (as all text fields in ST) can
+        be edited with only BackSpace. The other fields are same
+        as in edit samples. (see 2.3)
+
+4.4     Commands specific to the Edit Library mode.
+
+        TAB.....Used for toggling the upper/lower side. The current side
+                is displayed with triangles in the middle left side screen.
+        <,>.....Select previous/next sublibrary.
+        DEL.....Delete current instrument from the library
+        INS.....Make room for a new instrument
+        ALT-M...Move instrument to different disk. The disk will be prompted
+                after selecting this command. The sample will be deleted form
+                the old disk.
+        ALT-C...Copy current sub-library to clipboard.
+        ALT-F...Fill clipboards disk values with the disk value in the first
+                instrument in the clipboard (the one on row 0)
+        ALT-P...Begin place function. Place can only be started in the
+                clipboard. When ALT-P is pressed, the instrument under cursor
+                appears to the middle of the screen. Then the cursor can be
+                moved to a library this instrument should be situated. When
+                pressing enter the instrument will be inserted to cursor.
+                After the instrument is placed, a next instrument in the
+                clipboard will appear to the middle of the screen and can
+                be placed. ALT-P also terminates the place function. When
+                place is in effect, all TEST fields will play the sample
+                which is to be placed.
+        ALT-S...Will skip the instrument currently being placed and selects
+                the next instrument for placing.
+	SPACE...When pressed on the filename field, pops up a filepad which
+		displays instruments in cache, and from where you can quickly 
+		select an instrument on the harddisk.
+
+4.5     Creating the instrument library
+
+4.5.1   Creating a library manually
+
+        To simple but hard way to create the library is to copy
+        instruments as you gather them to instrument disks, and
+        then add them to the library by writing their name, description
+        and other parameters.
+
+4.5.2   Easier creation way
+
+        If you have many modules already, you can exstract the instruments
+        and their parameters from the modules. This can be accomplished
+        by loading a module at a time, and then executing ALT-T from
+        the edit samples mode to copy the instrument information to
+        the clipboard. The ALT-T also saves all the samples in the module
+        to instrument disk 99 (hard disk). After ALT-T has been pressed,
+        one must go to the clipboard in edit library mode, and move,
+        if he want's to, the instruments to other instrument disk, and
+        thus freeing space on the harddisk. This can be accomplished with
+        ALT-M. Then the instruments must be moved to their correct
+        directories with the ALT-P (place) function.
+
+4.5.3   Adding separate samples easily
+
+        To add a group of samples easily, copy them to the ADD directory.
+        Then execute ALT-A, which will transfer them to instrument disk 99
+        and copy their names to the clipboard, from where you'll only have
+        to place (move) them.
+
+
+5       Orders
+
+5.1     What are they?
+
+        The orders are used to define the order in which the patterns are
+        played.
+
+5.2     Editing orders
+
+        The get to the diting mode, you must either press F1, or select
+        Orders from Edit menu. The edit orders display is divided into
+        two coluns, the left one specifying the order number, and the
+        right one specifying which pattern to play at that order.
+
+5.3     Commands specific to Edit Orders
+
+        DEL.....Deletes the order the cursor is on
+        INS.....Makes room for order to the cursor
+        ALT-C...Clears the song/samples. When ALT-C is selected, the
+                program will ask whether samples should be preserved,
+                so you can save the instruments, but clear only the
+                patterns in addition to clearing the entire song.
+
+
+6       Patterns
+
+6.1     What are they?
+
+        The patterns describe the actual notes to be played. The music
+        is divided into patterns mainly to make it easier to repeat
+        some parts of it. This can be accomplished by simply playing
+        patterns many times.
+
+6.2     Editing patterns
+
+        The edit patterns mode can be netered with either F2 or with
+        menus. The screen is divided into 5 main columns, of which
+        the first one specifies the row, and tha last four ones each
+        represent channels (leftmost is number 1, rightmost number 4).
+        Each channel consists of 6 subfields:
+        C#1 02 ùù H08
+        ³ ³ ³  ³  ³ÀInfo byte
+        ³ ³ ³  ³  ÀSpecial command
+        ³ ³ ³  ÀVolume (ùù = default)
+        ³ ³ ÀInstrument (ùù = last one)
+        ³ ÀOctave (0-4)
+        ÀNote
+        The note field, as it's name suggests, specifies the note to be
+        played, and the octave field at which octave the note is to be
+        played. The instrument field specifies the instrument used
+        for this sample. It has no effect is note is not specified.
+        It can also be omitted. If so, the last instrument for that
+        channel is used. The next field specifies the volume for
+        an instrument. It can be changed while a note is being
+        played to create volume slide effects. If it's omitted, the
+        default volume for the current instrument is used. The last two
+        fields specify a possible special command.
+	  There are also defaults for some values. They are shown on the
+	screens upper section. Defaults include octave (for the keyboards
+	bottom row), volume and sample. Defaults can be changed with
+	approriate keys or by writing a new value to volume/sample/octave
+	field. Last value written to any of the previously mentioned fields
+	will make it a default one for future operations.
+
+6.3     Commands specific to Edit Orders
+
+	+,-....Change pattern
+	/,*....Change default octave
+	<,>....Change default sample
+	INS....Insert row. This command inserts an empty row to the cursor.
+	       Notes beginning from the one the cursor is on are moved one
+	       row downwards and the last note in the pattern is deleted.
+	DEL....Delete row. This command deletes the row the cursor is on
+	       and moves all the rows below one row upwards. It empties
+	       also the new last note in the pattern.
+	.(dot).Deletes the note currently on writing empty on top of it
+	ALT-B..Mark area begin. The area is displayed with blue background.
+	ALT-E..Mark area end.
+	ALT-T..Mark entire pattern to pattern. Handy for copying entire
+	       patterns!
+	ALT-L..Mark entire channel to area.
+	ALT-U..Unmark area. This removes the blue background.
+	ALT-C..Copy marked area to clipboard. This command copies the
+	       area with the blue background for later copying.
+	ALT-P..Insert clipboard to cursor. Inserts the clipboard to
+	       the current cursor position moving notes under it 
+	       downwards in the pattern.
+	ALT-O..Overwrite clipboard to cursor. This command copies
+	       the clipboard to cursor and deletes any notes it is
+	       placed upon.
+	ALT-S..Set sample in area. Sets every sample number on the
+	       area selected to current sample.
+	ALT-V..Set volume in area. Sets the default volume to entire
+	       area.
+	ALT-A..Substract halfnote from area. This command decreases
+	       every notes value by a halfnote on the selected area.
+	       For example C#2 becomes C-2 and C-3 becomes B-2.
+	ALT-Q..Add halfnote to area. Same as substract, but adds 
+	       instead of substracting.
+	ALT-M..Toggle polymode for channel. With this command you can
+	       include/exclude channels from polymode note-entering.
+	       in polymode entering, the cursor is moved to the next
+	       channel having the polymode set whenever a note is entered.
+	       Thus in polymode notes pressed will be divided between
+	       selected channels. This allows notes to play longer;
+	       a new note can start while the old one is being played.
+	       Of course this takes more channels. Polymode is disabled
+	       if no channels are selected. The selected status is shown
+	       on the bottomrow.
+	ALT-Z..Erase marked area. This command clears the area selected
+	       to empty note values. Use it with care!
+
+6.4     Special commands
+
+6.4.1   What are they?
+
+        The special commands can be used to change the way a note is played
+        and also alter songs order and other things. They consist of a letter
+        secifying the command, and an hexadecimal infobyte. (volume and
+        instrument are decimal). There is one important (and complex) thing
+        one should know about special codes. That is WHEN they are processed.
+        It matters only with codes altering pitch, volume or other things
+        which will be changed softly. For every row, these commands will
+        be run by TEMPO/10-1 times. For example if tempo is 60, the volume
+        slide will be run 5 times, which means that command D02 slides
+        the volume down 5*2=10 units every row.
+
+6.4.2   List of special commands
+
+        A - Tempo. This command sets the tempo for the song. The tempo
+            can be changed anytime, and effects all four channels. The
+            default tempo is 60.
+        B - Jump. This command breaks the current pattern, and jumps
+            to order row specified by the infobyte. It can be used
+            to create a beginning for a song, which is not repeated
+            when the song ends. i.e. it can be jumped over.
+        C - Break. This command breaks the current pattern, and
+            plays the next one in orderlist.
+        D - Slide volume. This command slides volume up/down.
+            If the hi nibble (the left hex digit) is specified, the
+            volume is increased by the amout the digit specifies.
+            If the lo nibble is set, the volume will be decreased.
+        E - Portamento up. This command slides the notes pitch
+            up by a specified amount.
+        F - Portamento down.
+        G - Note Portamento. This command slides to a note. It's
+            most easily clarified by an example:
+            C-2 01 .. .00   On this line, instrument 1 starts playing
+            ..  .. .. .00    note C2.
+            E-2 .. .. G05   On this line, note E2 is NOT played, but
+            ... .. .. G05    the pitch is slided by amount of 5 towards
+            ... .. .. G1F    the E2 note. Remark that the amount must again
+            be multiplied with the TEMPO/10-1 told about in the previous
+            chapter. When the pitch reaches the note specified when it was
+            started, the command has no effect.
+        H - Vibrato. This command vibrates the sample, at a speed specified
+            by the hi-nibble (bigger is faster). The lo-nibble specifies
+            the vibrato size. (bigger is more vibrating).
+        I - Tremor. This command rapidly turns the sound on/off.
+            the hi-nibble specifies the time the sample is to be on
+            (subrows, speified by the TEMPO/10-1) and the lo-nibble
+            the time it should be off. The sound is tremored as long as
+            the tremor commands are set.
+        J - Arpeggio. Play chords. Alters the notes pitch fast. Three
+	    stages: Note, Note+lo nibble halfnotes, Note+hi nibble halfnotes
+	    (NOTE: Arpeggio hasn't been tested with Amiga musics using it
+	    (note found) so it probably differs with amiga.
+	K - Volume portamento. Not yet operative.
+	L - Volume vibrato. Not yet operative.
+	    
+
+7       Sample list
+
+7.1     What is it?
+
+        The sample list, as it's name suggests, lists all samples used
+        in the song. It also contains different parameters for all
+        samples (parameters have been described earlier in this document).
+        When instruments are added or deleted from the list, the samples
+        should be reloaded by pressing F7. The fields are same as in
+        Edit Library, with two exceptions. First the description field is
+        not availible, and second, there are two 'Test' fields. You
+        can also edit the song name from sample list by pressing ALT-E.
+
+7.2     Test fields and beat testing.
+
+        There are two test field after each sample name. By pressing
+        the pianokeyboard keys while in this filed, the sample will
+        be played. The 'Test1' field test the sample in one channel,
+        thus each keypress starting a new note stops the previous
+        note. The 'Test4' field enables you to play multiple notes
+        so that they all play together. This is accomplished by
+        playing the instument in each of the four availible channels,
+        so if first note goes to channel 2, the next one goes to channel 3
+        and so on. When all channels are used (4 notes played simultaneusly)
+        the next note goes to the first channel and removes the oldest
+        of the 4 notes from playing.
+          There is also an Beat Test (ALT-B) option. In this mode you
+        can easily play multiple instruments and test rythms etc. When
+        in this mode, a text will be displayed and numbers '1'..'9'
+        play samples 1..9 and keys 'A'..'V' samples 10..31. The samples
+        are played at C2. To alter height in beat testing, change the
+        C2SPD field from sample list.
+
+7.3     List of commands
+
+        <.......Substract 10h from tempo
+        >.......Add 10h to tempo
+        /.......Substract 1 from tempo
+        *.......Add 1 to tempo
+        ALT-E...Edit song name (on upper screen)
+        ALT-S...Save samples to disk(s). Every sample will be saved to
+                the disk named in 'Ds' field. Disk 00 means to cache
+                directory (INS).
+        ALT-O...Save one sample. The sample the cursor is on.
+        ALT-L...Load one sample from disk. As F7, but for the one cursor is on.
+        ALT-B...Beat testing
+        ALT-C...Copy all instrument to library clipboard.
+        ALT-M...Move instrument to different disk
+        ALT-T...Same as ALT-C + moves all instruments to disk 99.
+        ENTER...Pick instrument from library.
+	SPACE...When pressed on the filename field, pops up a filepad which
+		displays instruments in cache, and from where you can quickly 
+		select an instrument on the harddisk.
+
+
+8       Loading, saving and playing songs
+
+8.1     Loading a song/module
+
+        To load a song/module, select Load form main menu, or press
+        either CTRL-R (for module), CTRL-L (for song) or CTRL-A
+        (for amiga module). The use the file selection pad to
+        select the correct file.
+
+8.2     Saving song/module
+
+        Saving is similar to loading, with one exception. Amiga modules
+        can not be saved. They must be saved as ST modules.
+
+8.3     Playing songs
+
+        There are many ways to play a song. The simpliest one is
+        pressing F5, which starts song in memory and displays infopage.
+        If song is already being played, the infopage is only redisplayed.
+        To restart song, press SHIFT-F5. There are also two playmodes
+        useful when composing a song. First one is play pattern (F6).
+        It will play the current pattern (the one the cursor is in in the
+        Edit Patterns window) over and over again, until stopped with F8,
+        which will always stop whatever is being played. The another
+        playmode is Play from order (SHIFT-F6) which starts playing from
+        order row the cursor is in in the Edit Order screen.
+
+8.4     Infopage and status line info
+
+        The infopage is displayed when the song is being played.
+        Infopage can be exited with ESC and recalled with F5. It shows
+        current instrument for each channel and a sort of volume meter
+        for each channel. The meter is not realistic, but paractically
+        works and shows when notes are struck, and at which volume.
+          The statusline will also give information about the music
+        while it's being played. From there you can see the current
+        order row, pattern, row and loops, which tells how many times the
+        song has been played (It doesn't always work, if jump to order
+        command is used.) The statusline also displays the percentage telling
+        how much of the song is played. All information is not displayed
+        when palying patterns.
+
+8.5     Scope
+
+        There is also alternate 'infopage'. It is a scope display, and
+        you can view it with CTRL-Z (or from menu). It displays the actual
+        (and realistic) curve displaying the data values ouputted to the
+        speaker. It is in fact songs 'waveform' in a way. Mainly the use
+        from scope is purely entertaining. The scoop display requires CGA
+        or compatible graphics display.
+	
+8.6	Tracking and Recording
+	
+	There are two quite similar playing modes which can also be used 
+	for easy song entering and sort of song debugging. The Trace Song
+	function starts from the beginning unless the song is already being
+	played. In this case it acts like Scope, and continues from the
+	current song position. It shows the patterns as they are played.
+	The cyan bar in the middle of the screen shows the current position
+	in song. The screen is updated while the song is being played.
+	  The record option is otherwise similar to Tracking but you can
+	select the current channel with arrows, and all notes you play,
+	will be put to the current song position, on the channel you are
+	on. Thus you can play a song from keyboard directly to memory.
+	  The tracking is not yet very exact, so you'll probably have to
+	modify the pauses between notes afterwards. It's also suggested
+	that you use faster tempo than normally. For example with tempo
+	30 the recording works quite well.
+
+8.7     Loading amiga modules
+
+        The load amiga module command (CTRL-A) prompts for filenames as normal
+        load. It converts amiga modules from MasterSoundTracker, SoundTracker
+        (..V2.4) and NoiseTracker (..V2.0). It requires modules to be unpacked.
+        After the conversion is started, you can see the number of patterns
+        converted in the right hand corner of the screen. On the screens
+        right side will also be dislayed all commands used in the song.
+        The left side will view the amigas 20 char filenames, which sometimes
+        contain a message rather than instrument names. The amiga names
+        will be truncated in the conversion. In the middle of the
+        screen possible errors are shown. Errors mean that something in
+        the module is not recognized by the converter, and doesn't
+        always mean the song won't work. Most often the song works fine,
+        but sometimes little differently than in amiga. It's also
+        possible that the conversion totally failes resulting in something
+        no one can call a song. If you plan to use the instruments
+        in the amiga module, check that the filenames are legal for
+        MS-DOS, before saving them. (The converter removes most illegal
+        names). Especially remember to fill 'empty' names. Normally
+        you can recognize whether or not a sample in sample list is
+        empty by looking at the volume. Amiga files normally have volume
+        0 in samples not used.
+
+
+===============================================================================
+
+
+	This document, the help file and the Scream Tracker are constantly
+	being enhanced, so it's possible they differ a bit from each other.
+	The help files quickhelps should always be accurate. Some recently
+	added commands might only be found on quickhelps! But as always:
+	try everything, and something may work out! 
+	
+

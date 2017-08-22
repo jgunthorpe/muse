@@ -1,0 +1,23 @@
+!include "..\..\..\makedefs.som"
+
+CFLAGS = $(COPTSOMTHREADDLL) -Ie:\toolkits\dev\h
+LFLAGS = $(LOPTSOMTHREADDLL)
+LIBS = -lMus2Base.lib -lmmpm2.lib
+
+all: $(BINDIR)\Mus2DAC.dll $(SHD)\MMPM2.xh $(SHD)\DART.xh
+
+OBJS = $(OUTDIR)\MMPM2.obj $(OUTDIR)\DART.obj
+
+$(BINDIR)\Mus2DAC.dll: $(OBJS)
+   echo Linking $@
+   $(LINK) $(LDDEF)SOM\DAC.def $(OBJS) $(LINKEND)
+   echo Implib
+   $(IMPLIB)
+
+$(OUTDIR)\MMPM2.obj: $(SHD)\MMPM2.hh MMPM2.cpp $(SHD)\DART.hh
+
+$(OUTDIR)\DART.obj: $(SHD)\DART.hh DART.cpp
+
+$(SHD)\MMPM2.hh: MMPM2.idl
+
+$(SHD)\DART.hh: DART.idl

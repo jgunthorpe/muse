@@ -1,0 +1,13 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\NAME.lib
+
+OBJS = $(OUTDIR)\NAME.obj
+
+$(LIBDIR)\NAME.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\NAME.obj: NAME.cpp $(SDH)\NAME.hc
+
+$(SDH)\NAME.hc: NAME.hc
+   $(CPHC)

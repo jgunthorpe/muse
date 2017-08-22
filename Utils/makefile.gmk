@@ -1,0 +1,22 @@
+#!/usr/bin/make -sf
+# -*- make -*-
+
+# linefile is removed because G++ 2.7 and exceptions don't mix well.
+
+# Define the library name
+LIBRARY = utils
+
+# The header files we want copied
+HEADERS =  sequence.h metaclss.h minmax.h thread.h debug.h cmdline.h strutl.h
+HEADERS += ptypes.h linefile.h llist.h
+
+# The source files that make the lib
+SOURCE = metaclss.cpp sequence.cpp thread.cpp debug.cpp cmdline.cpp strutl.cpp
+SOURCE += linefile.h
+
+# This does the rest automagically!
+ifndef REL
+REL = ..
+endif
+include $(REL)/makedefs.gmk
+	

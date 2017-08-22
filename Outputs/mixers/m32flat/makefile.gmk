@@ -1,0 +1,15 @@
+#!/usr/bin/make -sf
+# -*- make -*-
+
+# Define the library name
+LIBRARY = m32flat
+
+# The header files we want copied
+HEADERS = m32flat.h
+
+# The source files that make the lib
+SOURCE = m32flat.cpp mixerorg.cpp
+
+# This does the rest automagically!
+REL = ..
+include $(REL)/makedefs.gmk

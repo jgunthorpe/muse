@@ -1,0 +1,13 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\SimpFilt.lib
+
+OBJS = $(OUTDIR)\SimpFilt.obj
+
+$(LIBDIR)\SimpFilt.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\SimpFilt.obj: $(SDH)\DAC.hc $(SDH)\HandLst.hc $(SDH)\SimpFilt.hc SimpFilt.cpp $(SDH)\OutputBs.hc
+
+$(SDH)\SimpFilt.hc: SimpFilt.hc
+   $(CPHC)

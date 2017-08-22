@@ -1,0 +1,194 @@
+ULTRA TRACKER (.ULT) File Format discription
+by FreeJack of The Elven Nation & MAS of Prophecy
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+INFO by MAS:
+------------
+I don't make any changes to this format after UltraTracker v1.6 (ULT version
+2.2) ! So if you want to support the ULT format, this is the up to date 
+formatdiscription. If any things are added, changed, etc. I'll rename the 
+extension to something like: u2t, utm or similar !
+If you have problems/questions on the .ULT format fell free to contact me !
+(mas@doit.fido.de)
+
+Big sorry for the many changes in the past !
+
+FreeJack thanks:
+SoJa of YLYSY for help translating stuff.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ULT-File                                                                     ³
+ÃÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³Version³Offset           ³Length         ³Description                        ³
+ÃÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ALL    ³  0              ³byte[15]       ³ID block :                         ³
+³       ³                 ³               ³'MAS_UTrack_V001' ULT version 1.0  ³
+³       ³                 ³               ³'MAS_UTrack_V002' ULT version 2.0  ³
+³       ³                 ³               ³'MAS_UTrack_V003' ULT version 2.1  ³
+³       ³                 ³               ³'MAS_UTrack_V004' ULT version 2.2  ³
+³       ³                 ³               ³                                   ³
+³       ³                 ³               ³                                   ³
+³ALL    ³ 15              ³byte[32] ascii ³Song Title                         ³
+³ALL    ³ 47              ³byte           ³Number of songtext lines (NTL).    ³
+³       ³                 ³               ³Each line has 32 characters.       ³
+³ALL    ³ 48+NTL*32       ³byte           ³Number of samples (NOS)            ³
+³ALL    ³ 49+NTL*32       ³byte[SS] * NOS ³Sample Struct see Sample Structure ³
+³       ³                 ³               ³SS = 64; ULT 2.2 SS = 66           ³
+³ALL    ³ 49+NTL*32+NOS*SS³byte[256]      ³Pattern Sequence Table             ³
+³ALL    ³305+NTL*32+NOS*SS³byte           ³Number of tracks (NOT) Base 0      ³
+³       ³306+NTL*32+NOS*SS³byte           ³Number of patterns (NOP) Base 0    ³
+³2.1-2.2³307+NTL*32+NOS*SS³byte[NOT]      ³PAN-position table                 ³
+³       ³                 ³               ³[0 left]-[F right]                 ³
+³ALL    ³307+NTL*32+NOS*SS³               ³Event structure (see event struct) ³
+³       ³+NOT             ³varies         ³                                   ³
+ÃÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³The remainder of the file is the raw sample data. (signed)                   ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³Sample Structure (length: ULT 1.0 - ULT 2.1 = 64bytes ³ ULT 2.2 = 66bytes)   ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³Samplename : 32 bytes Sample name                                            ³
+³DosName    : 12 bytes when you load a sample into UT,                        ³
+³                      it records the file name here                          ³
+³LoopStart  : dbl word loop start point                                       ³
+³LoopEnd    : dbl word loop end point                                         ³
+³SizeStart  : dbl word see below                                              ³
+³SizeEnd    : dbl word see below                                              ³
+³volume     : byte     UT uses a logarithmic volume setting, ranging          ³
+³                      from 0-255 (ULT 1.0)                                   ³
+³                      from ULT 2.0: uses linear Volume ranging from 0-255    ³
+³Bidi Loop  : byte     see below                                              ³
+³FineTune   : word     Fine tune setting, uses full word value                ³
+³                      Linear Finetune                                        ³
+ÃÄÄÄAdditionalÄinÄULTÄ2.2ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³C2-Freqency: word     This is the frequency, UT uses to play a middle C,     ³
+³                      all other notes are calculated relatively to this      ³
+³                      value.                                                 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+8 Bit Samples:
+--------------
+SizeStart:
+The SizeStart is the starting offset of the sample. 
+This seems to tell UT how to load the sample into the Gus's onboard memory. 
+All the files I have worked with start with a value of 32 for the first sample, 
+and the previous SizeEnd value for all sample after that. (See Example below)
+If the previous sample was 16bit, then SizeStart = (Last SizeEnd * 2)
+SizeEnd : 
+Like the SizeStart, SizeEnd seems to tell UT where to load the sample into the 
+Gus's onboard memory. SizeEnd equal SizeStart + the length of the sample.
+
+Example:
+--------
+If a UT file had 3 samples, 1st 12000 bytes, 2nd 5600  bytes, 3rd 8000 byte. 
+The SizeStart and SizeEnd would look like this:
+
+Sample        SizeStart         SizeEnd
+1st            32                12032
+2nd            12032             17632
+3rd            17632             25632
+
+***Note***
+Samples may NOT cross 256k boundaries. If a sample is too large to fit into the
+remaining space, its Sizestart will equal the start of the next 256k boundary.
+UT does keep track of the free space at the top of the 256k boundaries, and
+will load a sample in there if it will fit.
+Example : EndSize = 252144
+If the next sample was 12000 bytes, its SizeStart would be 262144, not 252144.
+Note that this leaves 10000 bytes unused. If any of the following sample could
+fit between 252144 and 262144, its Sizestart would be 252144.
+Say that 2 samples after the 12000 byte sample we had a sample that was only
+5000 bytes long. Its SizeStart would be 252144 and its SizeEnd would be 257144.
+This also applies to 16 Bit Samples.
+
+16 Bit Samples:
+---------------
+16 bit samples are handled a little different then 8 bit samples.
+The SizeStart variable is calculated by dividing offset (last SizeEnd)
+by 2. The SizeEnd variable equals SizeStart + (SampleLength / 2).
+If the first sample is 16bit, then SizeStart = 16.
+Example :
+          sample1 = 8bit, 1000 bytes
+          sample2 = 16bit, 5000 bytes
+
+          sample1 SizeStart = 32
+                  SizeEnd   = 1032 (32 + 1000)
+
+          sample2 SizeStart = 516 (offset (1032) / 2)
+                  SizeEnd   = 3016 (516 + (5000/2))
+
+***Note***
+If a 16bit sample is loaded into banks 2,3, or 4
+the SizeStart variable will be
+(offset / 2) + 262144 (bank 2)
+(offset / 2) + 524288 (bank 3)
+(offset / 2) + 786432 (bank 4)
+The SizeEnd variable will be
+SizeStart + (SampleLength / 2) + 262144 (bank 2)
+SizeStart + (SampleLength / 2) + 524288 (bank 3)
+SizeStart + (SampleLength / 2) + 786432 (bank 4)
+
+BiDi Loop : (Bidirectional Loop)
+--------------------------------
+UT takes advantage of the Gus's ability to loop a sample in several different
+ways. By setting the Bidi Loop, the sample can be played forward or backwards,
+looped or not looped. The Bidi variable also tracks the sample
+resolution (8 or 16 bit).
+
+The following table shows the possible values of the Bidi Loop.
+Bidi = 0  : No looping, forward playback,  8bit sample
+Bidi = 4  : No Looping, forward playback, 16bit sample
+Bidi = 8  : Loop Sample, forward playback, 8bit sample
+Bidi = 12 : Loop Sample, forward playback, 16bit sample
+Bidi = 24 : Loop Sample, reverse playback 8bit sample
+Bidi = 28 : Loop Sample, reverse playback, 16bit sample
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³Event Structure                                                              ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³Note                : byte (See note table below)                            ³
+³SampleNumber        : byte (Sample Number)                                   ³
+³Effect1             : nib (Effect1)                                          ³
+³Effect2             : nib (Effect2)                                          ³
+³EffectVar           : word (Effect variables)                                ³
+³                                                                             ³
+³ The High order byte of EffectVar is the Effect variable for Effect1.        ³
+³ The Low order byte of EffectVar is the Effect variable for Effect2.         ³
+³***(Note)***                                                                 ³
+³ UT uses a form of compression on repetitive events. Say we read in the first³
+³ byte, if it = $FC then this signifies a repeat block. The next byte is the  ³
+³ repeat count. followed by the event structure to repeat.                    ³
+³ If the first byte read does NOT = $FC then this is the note of the event.   ³
+³ So repeat blocks will be 7 bytes long : RepFlag      : byte ($FC)           ³
+³                                        RepCount     : byte                  ³
+³                                        note         : byte                  ³
+³                                        samplenumber : byte                  ³
+³                                        effect1      : nib                   ³
+³                                        effect2      : nib                   ³
+³                                        effectVar    : word                  ³
+³                                                                             ³
+³ ! Repeat blocks do NOT bridge patterns. !                                   ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³Note Table                                                                   ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³note value of 0 = pause                                                      ³
+³C-0 to B-0    1 to 12                                                        ³
+³C-3 to B-3    37 to 48                                                       ³
+³C-4 to B-4    49 to 60                                                       ³
+³C-5 to B-5    61 to 72                                                       ³
+³C-6 to B-6    73 to 84                                                       ³
+³C-7 to B-7    85 to 96                                                       ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+That should about cover it. If you have any questions , feel free
+to e-mail me at
+freejack@shell.portal.com
+
+I can also be contacted on The UltraSound Connection   (813) 787-8644 
+The UltraSound Connection is a BBS dedicated to the Gravis Ultrasound Card.
+
+Also I'm the author of Ripper and Gvoc. If anyone has any questions or 
+problems, please contact me.

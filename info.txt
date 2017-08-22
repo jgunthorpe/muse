@@ -1,0 +1,140 @@
+SOM Background
+~~~ ~~~~~~~~~~
+  Muse was originally compiled in OS/2 using Direct to SOM (DTS). SOM is
+  IBM's solution to the binary incompatibility problem C++ has. Through
+  SOM a class creator can use any compiler and language irregardless of
+  the client. Also, the class can be modified fairly substantially without
+  breaking binary compatibility. To make full use of SOM's interlanguage
+  capabilities all Muse classes were originaly defined in IDL (Interface
+  Definition Language) and converted to the proper headers at compile time.
+
+  Unfortunately to provide DLL plugin ability Muse uses a SOM concept
+  called a MetaClass. A MetaClass, simply put, is a stub class that has
+  a single instance created on program load. The MetaClass can be used
+  to construct the actual class and to query some information about it.
+  In the C++ version of Muse the MetaClass is synthesized with a normal
+  C++ class containing a static instance of itself. These classes should
+  never be reinstantiated! During the MetaClasses construction at program
+  load (before main is called) the class links itself into the HandlersList
+  MetaClass dynamically constructing a set of supported file format and
+  output methods. This is similar to the SOM versions behavior, it scans
+  all dlls for Muse classes and loads them at run time, this linking is
+  done at link time, and greatly simplifies the addition of new classes.
+
+IDLSequence
+~~~~~~~~~~~
+  This is the dynamic array type used throughout the program. Like most
+  things it has it's roots in SOM, it corresponds directly to the CORBA
+  defined Sequence type. It's simple, fast and effecient, it consists of
+  exactly 3 variables, a current size, a max size and a pointer. These
+  variables represent the entire sequence, a strict set of guidelines define
+  who is responable for allocating and freeing the sequence, which can be
+  simply stated as 'caller frees', meaning the caller ALWAYS frees the
+  sequence sometime after a function call. Objects will internally duplicate
+  the sequence if needed. This is exactly backwards to the way C++ works. 
+  IDLSequence is very raw. It must be implicitly constructed etc. This may
+  be changed to include a constructor, but it will never implicitly destruct
+  it's storage.
+
+  To make the usage of the sequence simpler a template class is used to
+  encompass the 3 variables. However inorder to provide 100% compatibility
+  with the original design the template has no constructor or destructor,
+  instead two functions free() and construct() are used. The class follows
+  the STL pardigm of iterators. See the header for more information.
+
+MetaClass Specifics and Linking
+~~~~~~~~~ ~~~~~~~~~ ~~~ ~~~~~~~
+  Interestingly the following is valid code:
+      class A
+      {
+         public:
+         static AClass *__ClassObject;
+      };
+
+      class B : public A
+      {
+         public:
+         static BClass *__ClassObject;
+      };
+  This is used to provide the metaclasses, A and B are normal instantiable
+  classes that define a static metaclass object. Hence, B::__ClassObject
+  will always return the metaclass for the class. And A::__ClassObject
+  similarly.
+
+  To provide a limited hack for RTTI (and to emulate some calls required
+  in a SOM environment) the metaclass provides a virtual function,
+  somDescendedFrom to determine if the meta class is derived from another
+  metaclass. Eg:
+    if (OutputClass->somDescendedFrom(museFileOutput::__ClassObject) == TRUE)
+  This is done by comparing the passed pointer to x::__ClassObject at each
+  level of the class.
+
+Flow
+~~~~
+  Well here is a basic diagram of how it all works.
+  
+    FileFormat -> Output
+    
+  Amazing, Yes? 
+  When a DAC device is used Output is much more complex:
+  
+    Output = MixerCommon -> Mixer -> Filter -> DAC
+    
+  The general operation is to convert a File into muse pattern data. Muse
+  Pattern Data is basically raw commands to send to a device like a GUS.
+  There is no intermedate step. 
+  
+  Most other module players convert all formats into 'MyPlayer format' on the 
+  fly then they convert 'MyPlayer format' into Muse Pattern Data. Muse skips
+  this middle step. This does two things:
+     - Makes all the file formats friggin huge.
+     - Makes all the file formats absolutely correct.
+
+  We decided the size tradeoff was worth the perfection we can achive by
+  giving each format the ability to do anything. Also new radical formats
+  like IT was/is are much easier to integrate into the player. There are
+  no side effects, fixing a bug with some S3M's will not cause a bug in mod
+  etc etc. There is one exception. MTM, MOD and WOW are all combind and do
+  actually translate to an intermediate format (MOD). This is because those
+  3 formats are all exactly the same.
+  
+The Plot Thickens
+~~~ ~~~~ ~~~~~~~~
+  Since Muse is designed to be a blocking thread based player with a large
+  delay between computation and output (for 'tasking) we needed someway
+  to display current information. I created a TimeBuffer class which
+  buffers delta pattern data till it's actually played. TimeBuffer can be
+  considered a translator, it accepts Muse Pattern Data in one end, does
+  stuff and then spits it out the other end to some other class. The UI
+  creates it and links it into the output chain.
+  
+  Furthermore people wanted to be able to perform effects on the raw pattern
+  data, like channel masking, volume shaping and what not. This is done
+  through an Effects translator. The end result is that Pattern Data flows
+  like:
+  
+    Format -> Effects -> Time Buffer -> Mixer Base -> Mixer -> DAC
+
+  I wrote some other translator classes that dump pattern data and do
+  things like that, I think they are still around.
+  
+But, you never instantiate museS3MFormat!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  This is part of the dynamic metaclass sytem, format classes are
+  instantiated, right in their source file (look at the end). When linking
+  occurse the metaclass's static variable is instantiated and directly
+  before main() is called it's constructor is called by the compilers run 
+  time. At this instant it adds it self to HandlersList and becomes a viable
+  handler. The UI's use generic calls when dealing with everything so that
+  they do not need to be changed when new stuff is added. This is not required
+  it's perfectly valid to instantiate a class by hand. It also means the 
+  components that make up muse are determined at link time by what libs are 
+  included. 
+  
+  Some compilers have a problem with statics in libraries. The way it is
+  arranged the static causes a constructor to be called which causes the 
+  static to be referened (It's self referencing you see). A linker may not
+  include the static when it is in a library unless it's actually referenced
+  someplace in a .obj file that is not in a .lib. So there needs to be a 
+  list of calls to a dummy function in the MetaClass to force the compiler to
+  link the classes in. 

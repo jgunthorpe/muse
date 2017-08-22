@@ -1,0 +1,4 @@
+sngtypes.cpp(106): Warning! W665: (col 21) temporary object used to initialize a non-constant reference 
+sngtypes.cpp(257): Warning! W665: (col 26) temporary object used to initialize a non-constant reference 
+sngtypes.cpp(271): Warning! W665: (col 29) temporary object used to initialize a non-constant reference 
+sngtypes.cpp(276): Warning! W665: (col 29) temporary object used to initialize a non-constant reference 

@@ -1,0 +1,342 @@
+Muse V1.4 a Digital Module Player
+April 1997
+
+This program is freeware, meaning it can be freely distrbuted so long as
+no files are removed and none of the included files are altered in any way.
+If you are going to rip portions of this document then please credit us.
+
+Modules
+~~~~~~~
+   A Module, in this sense, is a music file format that stores both digital
+   instruments and note information. Unlike MIDI files which are soly note
+   information and WAV files which are a single digital instrument. Modules
+   use a technique known as Wave Table Synthesis or Digital Mixing for play
+   back. A more advanced, but similar system is used in most of today's
+   synthesizers.
+
+   The result is a reproduction identical to what the origial author intended
+   and unlike a digitial recording the size does not grow very large for
+   long songs. A 30 minute song could easialy be a mear 300k. Almost all
+   of the space in a module file is used by the instruments.
+
+   Instruments in a module are fairly simple, an attack portion which is
+   used to simulate the striking of the instrument the sustain portion which
+   is used to simulate the way the instrument sounds if it is continuously
+   played and in some formats the decay portion which simulates the relase
+   sound. On a guitar each portion could sound similar to the following:
+      Attack - the fingers striking the strings
+      Sustain - The free vibration of the strings
+      Decay - the hand hitting the strings to stop the vibration
+
+   The note infomation is organized into channels, each channel can play
+   1 note at a time, so the more channels the more notes you can have at
+   once.
+
+   Unlike MIDI files which are played in hardware (ie with the FM chip on a
+   Sound Blaster) MOD files are played in software.  The DAC (digital to
+   analog converter) on your sound board is used to play digital data which is
+   synthesised by the program.  Some cards, like the Gravis UltraSound (GUS),
+   have a specialized chip onboard which does this same process, but in
+   hardware.  Since the CPU must be used to generate the data to be played,
+   time is taken away from other programs in the system. Multitasking
+   allows you to do other things while the song is playing, but your system
+   will seem slightly slower. This is because data is being streamed to the
+   sound card at 176.5k/s (for 44kHz 16bit playback). 
+
+   Since the synthesis method basically generates the equivilant of a WAV
+   file, it has many characteristics of a WAV file, like Sampling Rate and
+   bit rate. Sampling rate and bit rate combine to determine how good the
+   resulting sound will be. CD's use a Sampling rate of 44KHz and a bit rate
+   of 16 bits, this is considered sufficiant to reproduce a wide range of
+   sound with good accuracy.
+
+   There are many different formats for modules, a quick list:
+      MOD - Original format, from the amiga which had a hardware chip to do
+            the synthesis. Many different formats for mods exist, ranging
+            from 4 to 32 channels
+      STM - Early predecessor to S3Ms, 4 channels, but several enhancements
+            on the MOD idea (Scream Tracker 2)
+      MTM - A refinement on mods, 32 channels and 16 bit samples are added
+      669 - Early multi channel module format, 8 channels and 9 commands.
+      S3M - A format that doesn't look very much like a mod (internally) but
+            works in much the same manner. Typicaly called Scream Tracker files.
+            16 channels
+      XM  - Fast Tracker ][ Files, unique things such as envolopes and
+            an instrument/sample model are used in this format.
+            32 channels
+      ULT - UltraTracker, 32 channels, multiple effects, and better sample
+            definition
+      FAR - Farandole Composer files
+            32 channels
+      WOW - Very uncommon 8 channel MOD derivitive
+      IT  - Impulse Tracker, this file format can have up to 256 channels,
+            and uses new note action (NNA) which is very much like MIDI.
+            Many of these songs require 64 channels to play.
+      IT2 - A more advanced version of the IT format.
+
+   Currently Muse/2 supports all of the above formats and a few others.
+
+   Some good FTP sites for S3M's are:
+      kosmic.wit.com /kosmic/songs
+      ftp.cdrom.com  /demos/music/songs/199?/S3M
+                     /demos/music/songs/199?/MTM
+                     /demos/music/songs/199?/MOD
+                     /demos/music/disks
+
+   If you don't have any, I recommend the following songs to get a good
+   feel of what MODs are.
+
+    Light techno style of music, excellent samples and fairly long songs:
+      ftp://kosmic.wit.com/kosmic/songs/95/k_macro.zip (241k)
+      ftp://kosmic.wit.com/kosmic/songs/95/k_2deep.zip (183k)
+
+    ftp://ftp.cdrom.com/demos/music/disks/1996/t/theland.zip (900k)
+      The Land Series from Lord Blanka the Black
+
+    ftp://ftp.cdrom.com/demos/music/songs/1995/mtm/p/potrm.zip (348k)
+      Techno style
+
+    ftp://ftp.cdrom.com/demos/music/disks/1995/l/legacy.zip (1.4 Meg, Many songs)
+      Music Disk from Neophyte widely varied.
+
+    ftp://ftp.cdrom.com/demos/music/disks/1995/f/f10_pck5.zip (1.7 Meg, Many songs)
+    ftp://ftp.cdrom.com/demos/music/disks/1995/f/f10_pck6.zip (1.9 Meg, Many songs)
+      Music Disk from Force Ten, contains rock and jazz styles of music
+
+    ftp://ftp.cdrom.com/demos/music/disks/1995/f/fm*
+      Music by FM (Five Musicians) Excellent Quality S3Ms
+
+    http://www.teleport.com/~smithtl/modpage/modpage.htm
+      The MOD page, lots of great stuff!
+
+  FTP sites people tell me about
+    ftp://solo.lhg.hib.no/pub/mods/composers/Skeletor
+    http://www.america.net/~friedmen/mod_file_links.html
+    http://www.watson.org/mods
+
+   Five Musicians
+    ftp.fm.org
+
+Muse
+~~~~~~
+   Muse/2 was the first released OS/2 S3M player, it first appeared in the
+   Ethos Peripheral Evolution Demo, and had been in beta for at least 2
+   months before. This was during the summer of 1995, it played it's
+   first module about May 1995. After that it went on to aquire a larger
+   array of formats, GUS support and many other features.
+   
+   Muse was also the first player to support the new IT format, it predates
+   Cubic and MikIT. A released version of IT support was in July 1996!
+   
+   Sometime later I started using Linux and was quite disappointed with the
+   quality of the modules players and decided to port Muse over. At this 
+   point the name changed from Muse/2 to simply Muse.
+
+ Installing
+
+To be done still.
+
+ Playing Songs
+
+   To play a single file type 'muse asong.s3m'. Muse will autodetect
+   your sound device and play the song.
+   
+   Right now the current UI can play a list of songs, but will not do wild
+   card expansion internally, which is irrelivant for linux.
+
+Notes about the Components
+~~~~~ ~~~~~ ~~~ ~~~~~~~~~~
+ S3M Format
+   This S3M player supports all of the normal S3M commands.  It does support
+   the DMP panning command, which includes surround sound mode!
+
+   Large S3M samples are supported.
+
+ MOD Format
+   The MOD player supports the following MOD types
+      - 15 sample modules
+      - ProTracker modules (4 channels)
+      - NewTracker modules (4 channels)
+      - FastTracker modules (6,4 channels)
+      - FastTracker II modules (max 32 channels)
+      - Startrekker modules (4,8 channels)
+      - Atari Octalyser modules (8 channels)
+      - Unknown name OCTA format (8 channels, never actually seen one)
+      - unmarked 31 sample 4 channel modules
+   All standard protracker commands are supported.
+
+   Files by the extention .nst and mod.* are also recognized as MODs.
+
+ MTM Format
+   The MTM player supports all of the documented MTM effects, as well as
+   large samples and 16 bit samples, although I have yet to see a MTM
+   that has 16 bit samples!
+
+ WOW Format
+   Suports 8 channel WOW files, and all Protracker commands. WOW files are
+   created by "Mod's Grave" (aka "Grave Composer") for the IBM.
+
+ XM Format
+   Supports Fast Tracker ][ XM files. All commands and functions are supported.
+
+ STM Format
+   Scream Tracker 2 files, .STM. All commands are supported.
+
+ 669 Format
+   Composd Files, all documented commands are supported.
+
+ IT Format
+   The Latest IT2 files are now supported!
+
+ Digital Mixer
+   The Digital Mixer is capable of 8 or 16 bit output and can handle any
+   bit rate. It supports surround sound encoding for modules that have a 
+   command to enable it.
+ 
+   The mixer implements a scaling algorithm to give high quality output. The
+   basic idea is that louder is better. Internally Muse mixes at 32 bits of
+   precision. Each channel is computed at 24 bits and is summed with all the
+   other channels to give a final 32 bit waveform. This waveform is then
+   crunched down to fit in 16 or 8 bits. Now, normally the crunching is done
+   so that all channels can play at their loudest and the output will still
+   sound correct, this is called 100% Scaling. This assumption is often
+   faulty, in modern modules the higher channels are more often used to 
+   simply add depth to the sound, and don't contribute to making it louder. 
+   This is were the scaling comes in. Instead of scaling to 100% it is often
+   a good idea to set the value higher, based on the number of channels the
+   module has. Ie most 16 channel songs play well with 300%, 32 channels
+   play nice with 600% and IT files generally play well with 1000% scaling.
+   
+   At one point Muse had an element called Dynamic Scaling Control. It 
+   attempted to continually compensate for the songs current dynamic range in
+   an attempt to get the highest quality output. For now this has been removed
+   and the scaling factor must be manually set with the --scale option.
+   
+ MMPM/2 (OS/2)
+   MMPM/2 based output does not support the pause command.  Since it does not
+   use IBM's new DART system all of the UI commands will take a few moments to
+   come into effect.  This is due to the non realtime nature of the MMPM/2
+   system.  While you are waiting for a command to change the ouput you can
+   still continue to use other commands. Ie hit ] many times to advance
+   many songs, the line at the top will display the current song and when the
+   song is finally loaded the rest of the information will be filled in and
+   the audio will catch up.
+
+   The MMPM driver will automatically determine the highest Sampling Rate/Bit
+   Rate your sound card can support.
+
+ DART (OS/2)
+   This is an implementation of IBM's new Direct Audio Real Time system.  To
+   use it you muse have the new DART enabled multimedia DLLS.
+     AMPMXMCD.DLL
+     AUDIOSH.DLL
+   These dlls must be used to replace the existing mmpm dlls, see the readme
+   file in that directory for more information.
+
+   Also, it is possible to obtain the DART dlls from the Ultimate Sound
+   Page, http://wvnvaxa.wvnet.edu/~hrieke/us.html.
+
+   DART is used to enhance the stablity and speed for background playing, less
+   memory and cpu are used by the DART output method than the normal MMPM/2
+   method, and better skip control is also achieved.  Pause and Resume
+   are implemented. The -T command line option can be used to make DART
+   function in Real Time, meaning all commands take effect at once. However
+   changing songs produces some noise. I recomend using DART without the -T
+   option as it also makes multi tasking less jerky.
+
+   I think it's worth mentioning, It seems to be, that EVERY dirver shipped
+   with OS/2 supports dart to some degree, some of the Creative drivers have
+   small problems, but in general the drivers work fine with Muse.
+
+   -- NOTE Installing a fixpack tends to overwrite one of the two dart dlls,
+   when this happens half of dart is present. Muse will give some odd error 
+   and exit. You should reinstall the proper dart dlls.
+
+ Gravis UltraSound (OS/2)
+   Support has been added for the GUS in native mode through the Manely
+   drivers. Version 0.85 or later is required. The GUS driver also has an IMM
+   meaning you can load songs which are larger than the amount of GUS ram you
+   posses. This is especially usefull with large XM files.
+
+   Note, sometimes the GUS can lose timing, if this happens press F3 then F4.
+   This will reset the timing, this is fixed in driver versions greater than
+   1.10.
+
+ WAV File Output
+ AU File Output
+ RAW file Output
+   Used the -OWAV, -OAU, -ORAW options muse can write a song to a file, -f
+   specifies the file name. the -o option is fully supported to specify the
+   output type, except in .au were the output is fixed at 8012Hz, 16 bit.
+
+   RAW is a headerless file, just the raw digital data, and the .au is in the
+   SUN/NEXT U-Law encoded style.
+
+   -- Note, entire song lists can be recorded to a file, and looping songs
+   will generate infintely large files. This funtion is best used with the
+   -l option (prevent loop) and single songs.
+
+   If -f is not specified but -OWAV is the song's name will be used as a
+   basis for the output name, ie k_macro.s3m.wav.
+
+   --Note the test frame UI doesn't yet support this.
+   
+ OSS-DSP (Linux)
+   This driver uses the OSS style /dev/dsp to output digital data to your
+   sound card. It will attempt to auto detect the highest bit rate and 
+   sampling rate. The command line option --oss-dsp can be used to set the
+   device file to use.
+   
+Final Note
+~~~~~ ~~~~
+   Comments, Critisims, Bugs etc welcome at jgg@gpu.srv.ualberta.ca, please 
+   put Muse somewere in the subject line. I suppose it's worth pointing out
+   that if I don't get any email's, very little will happen. If you find
+   a bug please send it in -- ESPECIALY songs that play badly!
+
+   Big thanks to the IRC beta testers:
+      Nightboob Wizdom  Agent   HB        Jaxom
+      Hiro      Raethma Roberte Schu      Sacul
+      Sophisto  Sane    Malakai Solarian
+      TNSLB     darb    __NS__  Swordfish
+   If I forgot you then please email me -- I can't keep all the nicks right
+   anymore!
+
+   Greets to!
+      AFMOS        [Stang]     Lucien
+      madbrain     dandaman    Philo
+      Vip          MaxMars     Mandie
+      Stiltner     Force Ten   Khyron
+      Neophyte     Highlandr   Iron_man
+
+     All the beta testers,
+     Henry for his web pages,
+     Sander van Leeuwen and The #os/2 channel!
+
+   Big thanks to Sophisto for the WAV/AU code!
+
+ Credits
+ ~~~~~~~
+   Text UI - Jason Gunthorpe (Culus)
+   Text UI Graphics - Fred Boyle (Wizdom)
+
+   S3M Format - Jason Gunthorpe (Culus)
+   WOW Format - Jason Gunthorpe (Culus)
+   MOD Format - Nicholas Vinen (HB)
+   MTM Format - Nicholas Vinen (HB)
+   STM Format - Nicholas Vinen (HB)
+   XM  Format - Nicholas Vinen (HB)
+   PTM Format - Nicholas Vinen (HB)
+   669 Format - Nicholas Vinen (HB)
+   IT  Format - Nicholas Vinen (HB)
+   
+   AU/RAW/WAV - Sophisto / Jason Gunthorpe (Culus)
+   MMPM/DART/GUS - Jason Gunthorpe (Culus)
+   OSS-DSP - Jason Gunthorpe (Culus)
+   Digital Mixer - Jason Gunthorpe (Culus)
+
+Future Directions
+~~~~~~ ~~~~~~~~~~
+   We Will See.
+
+Email -> jgg@gpu.srv.ualberta.ca (Jason Gunthorpe)

@@ -1,0 +1,216 @@
+History of Changes for Muse
+
+ Key
+ ~~~
+    S3M,MOD,MTM,WOW,XM,STM,669,ULT,IT,FAR,PTM - File Formats
+    MBF - MOD Based Formats, MTM, MOD, STM, WOW (ProTracker command set)
+    FMT - All File formats
+
+    BSE - Base Code
+    DM  - Digital Mixer
+    MMP - MMPM/2
+    DRT - DART
+    DSP - OSS-DSP driver
+
+    WAV,AU,RAW - Output File Formats
+    OFT - All output file formats
+    
+    GUS - Gravis UltraSound Native Digital Mixer
+
+    TXT - Text UI
+    TFM - Test Frame UI
+    TUI - Tiny UI (Obsolete)
+
+Date     Key Change
+-------- --- -----------------------------------------------------------------
+04-22-97 S3M Fixed a bug in S3M note trigger relating to volumes [fishhead,
+             hyper3.s3m]
+
+-- Placed 1.4.0 on http://www.ualberta.ca/~jgg/muse (Linux only)
+04-08-97 FMT The rest of the formats are upgraded. The result is the loss of
+             about 40k from the binary and around 4k lines of code. 
+04-03-97 XM  Updated to the more modern class interface
+04-02-97 S3M Updated to the more modern class interface
+04-01-97 DM  Fixed ping pong loops in the new digital mixer
+03-25-97 TFM Added generalized commandline parsing and some other features to
+             make the Test Frame program more usefull for debugging, channel
+	     soloing priting etc. It also doubles as a nice basic ui.
+03-20-97 XM  Fixed a porta bug and a null instrument bug.
+03-10-97 DSP Wrote the OSS-DSP driver, what a joy this was to write, Linux
+             actually has a nice digital streaming mechanism.
+03-01-97 ALL Dusted it off and ported the whole mess to GCC and Linux! Many
+             code improvements all over the place. Alot has changed since
+             1.31, those changes were released in a program called 'dactest'
+	     that a few people saw. They were general all-round bug fixes to
+	     the base code and a vastly improved digital mixer. Unfortunately
+	     the changes resulting the trashing of the Text UI so they never
+	     got packaged up for a full release. Ik. With the Linux port
+	     I have taken the time to eliminate some of the sillyness that
+	     stayed simply because we were moving very quickly.
+
+-- Took a large break for skool
+
+-- Released 1.31
+07-29-96 GUS Arrg, Watcom's optimizer screwed up the GUS timing
+             (Apparently this was still broke after 1.31 <lame>)
+
+-- Released 1.3 on hobbes!
+07-29-96 IT  Added IT2 support
+07-20-96 TXT Fixed some minor bugs
+07-20-96 --- Getting ready for release of 1.3 (yes, an actual release :P)
+
+-- Took a little break to experiment with some new song list code and
+   some PM code :>
+
+05-13-96 MBF All working again, supporting pattern skip.
+05-11-96 MBF Fixed 00 infobyte on volume slides, and fixed STM tremor.
+05-10-96 MBF Altered arpeggio, it is still not 100% correct, but it sounds
+         S3M much better.
+05-10-96 MBF Fixed Horrible Vibrato bug
+05-10-96 S3M Fixed Square Wave to match st3 and emulated a ST3 vibrato quirk
+05-10-96 MOD Upgraded to the new system, Fixed a corrupted song loader bug
+05-09-96 S3M Fixed small vibrato bug
+05-09-96 S3M Added pattern skip/backwards, upgraded to new system, slightly
+             smaller
+05-01-96 SFX Removed all SFX code, will be added in a more powerfull way soon
+05-01-96 BSE Radically changed effect handling (Pitch/Speed) and improved,
+             channel mute and channel efx are now coded (TextUI NOT updated to
+             do this yet)
+05-01-96 DM  Added realtime pattern display, can now show current time, order
+         GUS speed row etc (TextUI NOT updated to do this yet though)
+05-01-96 BSE Changed format of pattern data and instrument data (all File
+             Formats will need a LARGE upgrade)
+04-07-96 IT  Massive IT playback improvments (Thanx to Ozone!)
+04-07-96 IT  Fixed a small loader and playback bug as well as better corrupted
+             song handling
+04-07-96 GUS Fixed ultraclicks in pingpong loops
+
+-- 1.2me on s3m.dfwmm.net
+04-05-96 DM  Added Dynamic Scale Control (DSC) hit D in the ui
+04-04-96 TXT Added un-RAR support (however it is slow, cause RAR doesn't work
+             very well in pipe mode)
+04-03-96 DM  Added several more filters
+03-29-96 S3M Changed which commands occur on frame 0
+03-27-96 IT  Added Impulse Tracker Playback
+03-21-96 S3M Changed the 00 infobyte handling to emulate st3 and Emulates ST3's
+             V command
+03-20-96 TXT Made the instrument display use hex volumes
+03-16-96 ULT Added ULT file support
+03-16-96 TXT -ls option to loop the songlist
+03-15-96 669 Added 669 file support
+03-13-96 MOD Recognizes mod.* as a mod file.
+03-13-96 DRT Fixed the way dart would chop the last 3 seconds from the song
+03-13-96 S3M Fixed s3m chips
+03-13-96 MBF Fixed pattern loop and fine slide
+03-13-96 S3M Changed handling of 0 Global Vol songs and fixed a bug in global
+             volume
+03-07-96 DM  Fixed a chip sample bug in > 88kHz chips
+03-06-96 DM  Improved speed, After Midnight CDE.mtm lost +13% on my machine.
+             Also arranged for 16 bit samples to NOT be downsampled to 8 bit
+             but for 8 bit samples to be upsampled to 16 bit, in the process
+             about 1M of arrays were removed.
+03-05-96 S3M Fixed vibrato pitch restore and tremor volume restore
+03-05-96 S3M Fixed retrig/vibrato combo
+03-05-96 MBF Fixed vibrato pitch restore and tremor volume restore (stm)
+03-04-96 TXT Changed the instrument screen a bit
+03-04-96 STM Added the full STM player
+03-01-96 XM  Added the full XM player
+02-28-96 DRT Mucked with DART
+02-17-96 MOD Fixed DOPE, all FT II mods are now rounded.
+02-17-96 ALL Removed the need for HC*.dll
+02-17-96 DM  Pentium optimized the mixer routine
+02-17-96 WOW Added WOW support
+02-17-96 MOD *.NST recognized as a mod
+02-17-96 MOD Names given to some song tags have changed.
+02-16-96 OFT Added all the output file formats, see -f option for specifing
+             file name, all player features are supported.
+02-16-96 DM  Added mono support eg, -o"22k -m6"
+02-16-96 TXT Added -v# to set the default volume.
+02-14-96 TXT Fixed -B
+02-14-96 GUS DIV/0 fixed
+02-09-96 ALL 1.2 Alpha test
+02-08-96 S3M Fixed a small bug, attempts to play insts > # of insts do not play
+             instead of playing the last one, [cant.s3m]
+02-08-96 TXT Added several more command files, a few do things not possible
+             from the UI.
+02-07-96 MOD Made the loader more like the S3M one, totally unconcerned about
+             truncated songs. Loads every song I have now, including 10 it
+             didn't before (they were corrupted).
+02-07-96 GUS Added pause and resume to the gus driver, also tuned the click
+             removal. Fixed GPF with leave.mtm (corrupted song)
+02-01-96 TXT Captured all errors from unzip and fixed the problem with songs
+             that didn't load right, it no longer exits.
+01-28-96 DRT Added bit rate and sampling rate autodetect
+01-28-96 MMP Added bit rate and sampling rate autodetect
+01-28-96 DM  Upgraded the Digital Mixer to support pitch and speed
+01-28-96 TXT Cached the song title for disply when flipping through the song
+             list
+01-28-96 S3M Enhanced corrupted song handling (Distant3.s3m)
+01-26-96 GUS Upgraded the GUS driver to support alot of the new features
+01-26-96 TXT Added the volume control (-,+,=), pitch control (F1 F2), speed
+             control (F3 F4) and various combos of the above, (F5,F6, F7,F8)
+01-25-96 GUS Fixed a GPF on loading some songs
+01-25-96 TXT Wrote some rexx cmd files to use the pipe
+01-24-96 TXT Added a remote control pipe system (see muse2rmt.cmd). This
+             allows TOTAL control over a running copy of muse. Thanks to
+             Khyron/Roberte for the Idea
+01-23-96 TXT Added a detached mode to the UI, uses less ram/cpu etc.
+01-22-96 TXT Added a neat little Size of Song list indicator, determines the
+             total amount of space all the songs use (uncompressed). Also added
+             -L option and L key.
+01-20-96 TXT Added a new set of graphics for the display, thanks to Wizdom!
+             -U2 will bring back the old set.
+01-19-96 TXT Created the Text UI, basically a complete rewrite of the Tiny UI
+             this new version has many improvments, including better song list
+             handling (now does ZIP's) A few more keys and a brighter future!
+             (Tiny UI is now gone). Few things to try:
+               - Hold down [ or ] with a bunch of songs, great for seeking in
+                 the play list
+               - The \ key randomly selects a song
+               - Bit better Help screen
+               - Now works with screen widths > 80
+               - Added -R and -W options (see H screen for info)
+01-04-96 GUS Beta'd the GUS driver
+01-04-96 FMT Added -l option, prevents song looping
+01-04-96 MBF Fixed (or broke) command 13, skip pattern to row (Don't have a
+             song that uses it)
+12-29-95 DM  Fixed a clip problem in CRM&CRYS.MTM, also effected other songs,
+             ONLY in 8 bit mode
+12-13-95 MOD Fixed the jump to order command
+12-13-95 MOD Fixed the untagged 31 sample loader, was thinking a few 15 samp
+             songs were 31
+12-13-95 S3M Rewrote loader, faster and smaller (also loads songs that have
+             been truncated like book.s3m)
+12-13-95 TUI Autodetect Added, check out the -V option!
+12-12-95 DRT More Functions added, doesn't effect the player
+12-09-95 MMP Autodetect Added
+12-09-95 DRT Autodetect Added
+12-09-95 DM  More SFX Funcions, PlaySFX and SetVolumes
+11-29-95 DM  Minor bugfixes for SFX
+11-29-95 DRT Minor bugfixes for SFX
+
+11-26-95 All Placed on hobbes as V1.1
+11-25-95 TUI Changed the stats screen, now show song comments for MTMs
+11-25-95 DM  Allowed # to be used instead of % in the scaling.
+11-23-95 DM  Added amplfication scaling -o"22k 300% -6"
+11-23-95 TUI Fixed display of sample names
+11-22-95 MTM Added MTM support
+11-22-95 DM  Added 16 bit sample support.
+11-20-95 S3M Added Arpeggio (Jxx), Pattern loop (SBx), and Set Fine tune (S2x)
+11-20-95 MOD Added MOD support
+11-19-95 TUI Added -s and -S<num> options
+11-19-95 TUI Added -r songlist randomizer
+11-19-95 TUI Added some more information about the playback config on load
+11-16-95 DRT Added a Real Time mode for Sound Effects
+11-13-95 DRT Initial implementation of DART as an output method
+11-01-95 S3M Note reset to base period after some commands
+11-01-95 S3M Disallowed global changes on disabled channels
+10-25-95 S3M Fixed Command L  (Was retriggering)
+10-25-95 S3M Changed command B, doesn't disable C anymore
+10-25-95 S3M Fixed Command C (Decimal, not Hex)
+
+10-20-95 All Placed on hobbes
+10-20-95 S3M V1.1 Initial Release
+10-20-95 DM  V1.2 Initial Release
+10-20-95 MMP V1.0 Initial Release
+10-20-95 TUI V1.0 Initial Release

@@ -1,0 +1,26 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\M32Flat.lib
+
+OBJS = $(OUTDIR)\M32Flat.obj $(OUTDIR)\MixerOrg.obj $(OUTDIR)\MixerInt.obj &
+       $(OUTDIR)\Mix8B.obj $(OUTDIR)\MixInterp.obj
+
+$(LIBDIR)\M32Flat.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\M32Flat.obj: $(SDH)\DAC.hc $(SDH)\HandLst.hc $(SDH)\M32Flat.hc M32Flat.cpp $(SDH)\OutputBs.hc $(SDH)\Mix.hc
+
+$(OUTDIR)\MixerOrg.obj: $(SDH)\DAC.hc $(SDH)\HandLst.hc $(SDH)\M32Flat.hc MixerOrg.cpp $(SDH)\OutputBs.hc $(SDH)\Mix.hc
+
+$(OUTDIR)\MixerInt.obj: $(SDH)\DAC.hc $(SDH)\HandLst.hc $(SDH)\M32Flat.hc MixerInt.cpp $(SDH)\OutputBs.hc $(SDH)\Mix.hc
+
+$(SDH)\M32Flat.hc: M32Flat.hc
+   $(CPHC)
+
+$(OUTDIR)\Mix8B.obj: Mix8B.asm Mix8b.inc
+   echo Compiling Mix8B.asm into $(OUTDIR)\Mix8B.obj
+   tasm /oi /m2 /ml /t Mix8B.asm,$(OUTDIR)\Mix8B.obj
+
+$(OUTDIR)\MixInterp.obj: MixInterp.asm
+   echo Compiling MixInterp.asm into $(OUTDIR)\MixInterp.obj
+   tasm /oi /m2 /ml /t MixInterp.asm,$(OUTDIR)\MixInterp.obj

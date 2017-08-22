@@ -1,0 +1,32 @@
+!include "..\..\..\makedefs.som"
+
+CFLAGS = $(COPTCPPS) $(CSOM)
+LFLAGS = $(LOPTCPP) $(LSOM)
+LIBS = $(SOMLIBS) -limus2base.lib
+
+all: $(BINDIR)\Muse2Txt.exe
+
+OBJS = $(OUTDIR)\Muse2Txt.obj $(OUTDIR)\Screen.obj \
+       $(OUTDIR)\CommandLine.obj $(OUTDIR)\SongList.obj $(OUTDIR)\Displays.obj \
+       $(OUTDIR)\Pipe.obj
+
+$(BINDIR)\Muse2Txt.exe: $(OBJS) Muse2Txt.res
+   echo Linking $@
+   $(LINK) $(OBJS) $(LINKEND)
+  rc Muse2Txt.res $(BINDIR)\Muse2Txt.exe
+
+$(OUTDIR)\songlist.obj: songlist.cpp songlist.h
+
+$(OUTDIR)\CommandLine.obj: CommandLine.cpp SongList.h Screen.h
+
+$(OUTDIR)\Screen.obj: Screen.cpp SongList.h Screen.h Displays.h
+
+$(OUTDIR)\Displays.obj: Displays.cpp Displays.h Screen.h
+
+$(OUTDIR)\Muse2Txt.obj: Muse2Txt.cpp Screen.h
+
+$(OUTDIR)\Pipe.obj: Pipe.cpp Screen.h Displays.h
+
+Muse2Txt.res: Muse2Txt.rc usage.txt
+   rc -r Muse2Txt.rc Muse2Txt.res
+

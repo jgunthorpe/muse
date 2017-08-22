@@ -1,0 +1,21 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\DMF.lib
+
+OBJS = $(OUTDIR)\DMFForm.obj $(OUTDIR)\DMFPlay.obj $(OUTDIR)\Unpack.obj $(OUTDIR)\Unpacka.obj
+
+$(LIBDIR)\DMF.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\DMFForm.obj: $(SDH)\FormatBs.hc $(SDH)\HandLst.hc $(SDH)\DMFForm.hc DMFForm.cpp $(SDH)\OutputBs.hc
+
+$(OUTDIR)\DMFPlay.obj: $(SDH)\FormatBs.hc $(SDH)\OutputBs.hc $(SDH)\DMFForm.hc DMFPlay.cpp
+
+$(OUTDIR)\Unpack.obj: Unpack.cpp Unpack.h
+
+$(OUTDIR)\Unpacka.obj: Unpacka.asm
+   echo Compiling Unpacka.asm into $(OUTDIR)\Unpacka.obj
+   tasm /oi /m2 /ml /t Unpacka.asm,$(OUTDIR)\Unpacka.obj
+
+$(SDH)\DMFForm.hc: DMFForm.hc
+   $(CPHC)

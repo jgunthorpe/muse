@@ -1,0 +1,17 @@
+PLATFORM = OS2
+!include ..\..\..\makedefs.w32
+
+all: $(PLIBDIR)\GUSMixer.lib
+
+OBJS = $(OUTDIR)\GUSMixer.obj $(OUTDIR)\UltraDev.obj
+
+$(PLIBDIR)\GUSMixer.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\GUSMixer.obj: GUSMixer.cpp $(SDH)\GUSMixer.hc $(SDH)\OutputBs.hc
+
+$(OUTDIR)\UltraDev.obj: UltraDev.c
+
+$(SDH)\GUSMixer.hc: GUSMixer.hc
+   $(CPHC)
+

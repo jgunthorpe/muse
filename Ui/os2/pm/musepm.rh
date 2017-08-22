@@ -1,0 +1,23 @@
+#define	DLG_FILECHOOZER	1
+#define	DLG_CONTROLPANEL  2
+#define	LB_SONGLIST 257
+#define	LB_FILES 258
+#define	LB_DIRS	259
+#define  LB_DRIVES 260
+#define  ST_CURREFRESH 261
+#define  PB_REFRESH 262
+#define	PB_REMOVE 264
+#define	PB_ADD 268
+#define  PB_QUICKADD 269
+#define  PB_QUICKDEL 270
+#define  PB_QUICKGOTO 271
+#define	ED_NAME	272
+#define	ID_OK 273
+#define	PB_UNDO	274
+
+#define ICO_FOLDER 10
+#define ICO_FOLDEROPEN 11
+#define ICO_ARCHIVE 12
+
+#define PTR_DISKWAIT 9
+#define PTR_WAIT 8

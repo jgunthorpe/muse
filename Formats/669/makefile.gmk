@@ -1,0 +1,16 @@
+#!/usr/bin/make -sf
+# -*- make -*-
+
+# Define the library name
+LIBRARY = 669
+
+# The header files we want copied
+HEADERS = 669form.h
+
+# The source files that make the lib
+SOURCE = 669form.cpp 669play.cpp
+
+# This does the rest automagically!
+REL = ..
+include $(REL)/makedefs.gmk
+	

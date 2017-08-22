@@ -1,0 +1,146 @@
+/* ########################################################################
+
+   DACMixer - Class to allow Muse/2 to output a module to a MMPM/2 DAC.
+
+   This class supports a range of output formats from 8KHz Mono 8Bit to
+   44KHz stero 16 bit with both 16 and 8 bit samples. The module handler
+   calls Calc each cycle (called a frame in S3M's) which will mix that short
+   period into the output buffer.
+
+   This class should be CORBA complient. It uses the CORBA memory
+   managment philosophy which basically means that the caller must
+   allocate everything except out values and return values. The caller
+   must also free everything, including in values.
+
+   ########################################################################
+*/
+#ifndef MMPM2_IDL
+#define MMPM2_IDL
+
+#include <BaseSet\DAC.idl>
+
+interface museDACMMPM2;
+interface museDACMMPM2Class;
+
+interface museDACMMPM2Class : museDACMixerClass
+{
+   readonly attribute boolean DART;
+
+   #ifdef __SOMIDL__
+   implementation
+   {
+      majorversion = 1;                 // Major Version number
+      minorversion = 2;                 // Minor Version number
+      callstyle = oidl;                 // Use old call style
+      dllname = "Mus2DAC.dll";          // Set the dll file name
+      dtsclass;                         // DTS class
+      memory_management = CORBA;        // Caller-owns-result
+
+      // Define the compiler generated (C++ req'd) Const constructor
+      CompilerCCopyInit(museDACMMPM2Class)
+      CompilerDestruct(museDACMMPM2Class)
+      UserDefInit(museDACMMPM2Class)
+
+      GetTypeName: public, override;
+      IsSupported: public, override;
+
+   #ifdef __PRIVATE__
+      octet DetectStatus;
+   #endif
+
+      // Each new method is listed here. New methods are added AT THE END
+      releaseorder:
+           _get_DART;
+   };
+   #endif
+};
+
+// Declare some needed private structures
+#ifdef __PRIVATE__
+   #ifdef FILE_MMPM2
+   #pragma somemittypes on
+   #endif
+
+struct PlayStruct {
+   unsigned long OpCode;        // Operation code
+   unsigned long Operand1;
+   unsigned long Operand2;
+   unsigned long Operand3;
+};
+
+typedef SOMFOREIGN SeqPlayStruct;
+#pragma modifier SeqPlayStruct:  impctx="C++", cxxdecl="typedef IDLSequence<PlayStruct> SeqPlayStruct;";
+
+#pragma somemittypes off
+#endif
+
+interface museDACMMPM2 : museDACMixer
+{
+   #ifdef __PRIVATE__
+   long OpenMMPM(out string Error);
+   long CloseMMPM();
+   #endif
+
+   #ifdef __SOMIDL__
+   implementation
+   {
+      majorversion = 1;                 // Major Version number
+      minorversion = 2;                 // Minor Version number
+      callstyle = oidl;                 // Use old call style
+      dllname = "Mus2DAC.dll";          // Set the dll file name
+      dtsclass;                         // DTS class
+      memory_management = CORBA;        // Caller-owns-result
+      metaclass = museDACMMPM2Class;    // Define our meta class
+
+      // Define the compiler generated (C++ req'd) Const constructor
+      CompilerCCopyInit(museDACMMPM2)
+
+      // Use a custom constructor/destructor
+      UserDefInit(museDACMMPM2)
+      UserDestruct(museDACMMPM2)
+
+      InitPlay: public, override;
+      StopPlay: public, override;
+      PausePlay: public, override;
+      ResumePlay: public, override;
+      SetMixParams: public, override;
+      TestOutput: public, override;
+      GetNextBuffer: public, override;
+      StopWhenDone: public, override;
+
+      // Each new method is listed here. New methods are added AT THE END
+      releaseorder:
+         OpenMMPM,
+         CloseMMPM
+         ;
+
+      // Define the private variables.
+   #ifdef __PRIVATE__
+      long ObjectWindow;
+
+      octet *BufferBegin;
+      octet *BufferCur;
+      octet *BufferEnd;
+      unsigned long BlockSize;
+      SeqPlayStruct PlayList;
+      boolean Opened;
+      octet Playing;
+      unsigned long LastCount;
+      unsigned long BlockSem;
+      unsigned long DoneSem;
+      unsigned long PlayedBlocks;
+
+      unsigned long SamplingRate;
+      octet Bits;
+      boolean Stereo;
+      unsigned long LastDelta;
+
+      unsigned long DeviceId;
+      boolean DetectSRate;
+   #endif
+
+   };
+   #endif
+};
+
+#endif

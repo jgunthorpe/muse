@@ -1,0 +1,21 @@
+!include "..\..\..\makedefs.som"
+
+CFLAGS = $(COPTSOMTHREADDLL)
+LFLAGS = $(LOPTSOMTHREADDLL)
+LIBS = -lMus2Base.lib
+
+all: $(BINDIR)\Mus2GUS.dll $(SHD)\GUSMixer.xh
+
+OBJS = $(OUTDIR)\GUSMixer.obj $(OUTDIR)\UltraDev.Obj
+
+$(BINDIR)\Mus2GUS.dll: $(OBJS)
+   echo Linking $@
+   $(LINK) $(LDDEF)SOM\GUS.def $(OBJS) $(LINKEND)
+   echo Implib
+   $(IMPLIB)
+
+$(OUTDIR)\GUSMixer.obj: $(SHD)\GUSMixer.hh GUSMixer.cpp
+
+$(OUTDIR)\UltraDev.obj: UltraDev.h UltraDev.c struct.h
+
+$(SHD)\GUSMixer.hh: GUSMixer.idl

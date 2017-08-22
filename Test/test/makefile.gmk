@@ -1,0 +1,21 @@
+#!/usr/bin/make -sf
+# -*- make -*-
+
+# Define the library name
+PROGRAM = mustfrm
+
+# The source files that make the exe
+SOURCE = test.cpp
+
+# Libraries
+# Oddly these have to be in the reverse order of their dependancies. 
+# baseset depends on utils and everything else depends on baseset
+LIBS = archiver
+LIBS += ult ptm 669 far it xm mod s3m
+LIBS += ossdsp fileout simpfilt m32flat mixerbase 
+LIBS += baseset utils
+
+# This does the rest automagically!
+REL = ..
+include $(REL)/makedefs.gmk
+	

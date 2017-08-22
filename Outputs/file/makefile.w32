@@ -1,0 +1,23 @@
+!include ..\..\makedefs.w32
+
+all: $(LIBDIR)\File.lib
+
+OBJS = $(OUTDIR)\WAV.obj $(OUTDIR)\AU.obj $(OUTDIR)\RAW.obj
+
+$(LIBDIR)\File.lib: $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\WAV.obj: WAV.cpp $(SDH)\WAV.hc $(SDH)\DAC.hc
+
+$(OUTDIR)\RAW.obj: RAW.cpp $(SDH)\RAW.hc $(SDH)\DAC.hc
+
+$(OUTDIR)\AU.obj: AU.cpp $(SDH)\AU.hc $(SDH)\DAC.hc
+
+$(SDH)\WAV.hc: WAV.hc
+   $(CPHC)
+
+$(SDH)\RAW.hc: RAW.hc
+   $(CPHC)
+
+$(SDH)\AU.hc: AU.hc
+   $(CPHC)

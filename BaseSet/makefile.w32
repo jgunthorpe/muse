@@ -1,0 +1,81 @@
+!include ..\makedefs.w32
+
+all: $(LIBDIR)\BaseSet.lib
+
+MISCHC = $(SDH)\Flags.h $(SDH)\MinMax.h $(SDH)\Muse.h $(SDH)\Thread.h &
+         $(SDH)\Errors.h
+
+ALLHC = $(SDH)\OutputBs.hc $(SDH)\FormatBs.hc $(SDH)\DAC.hc $(SDH)\HandLst.hc &
+       $(SDH)\EFXFiltr.hc $(SDH)\TimeBuf.hc $(SDH)\Mix.hc
+
+OBJS = $(OUTDIR)\OutputBs.obj $(OUTDIR)\FormatBs.obj $(OUTDIR)\HandLst.obj &
+       $(OUTDIR)\MixerCom.obj &
+       $(OUTDIR)\EFXFiltr.obj $(OUTDIR)\TimeBuf.obj &
+       $(OUTDIR)\Mixers.obj
+
+#       $(OUTDIR)\Mixer.obj $(OUTDIR)\Filter.obj $(OUTDIR)\Mix.obj &
+
+$(LIBDIR)\BaseSet.lib: $(ALLHC) $(MISCHC) $(OBJS)
+   $(LIB) $(OBJS)
+
+$(OUTDIR)\OutputBs.obj: OutputBs.cpp $(SDH)\OutputBs.hc
+
+$(OUTDIR)\FormatBs.obj: FormatBs.cpp $(SDH)\FormatBs.hc
+
+$(OUTDIR)\MixerCom.obj: MixerCom.cpp $(SDH)\DAC.hc $(SDH)\OutputBs.hc $(SDH)\Mix.hc
+
+$(OUTDIR)\Mixer.obj: Mixer.cpp $(SDH)\Mix.hc
+
+$(OUTDIR)\Filter.obj: Filter.cpp $(SDH)\Mix.hc
+
+$(OUTDIR)\EFXFiltr.obj: EFXFiltr.cpp $(SDH)\EFXFiltr.hc $(SDH)\OutputBs.hc
+
+$(OUTDIR)\TimeBuf.obj: TimeBuf.cpp $(SDH)\EFXFiltr.hc $(SDH)\TimeBuf.hc $(SDH)\OutputBs.hc
+
+$(OUTDIR)\HandLst.obj: HandLst.cpp $(SDH)\FormatBs.hc $(SDH)\OutputBs.hc $(SDH)\HandLst.hc
+
+$(OUTDIR)\Mixers.obj: Mixers.cpp $(SDH)\Mix.hc
+
+$(SDH)\OutputBs.hc: OutputBs.hc
+   $(CPHC)
+
+$(SDH)\FormatBs.hc: FormatBs.hc
+   $(CPHC)
+
+$(SDH)\HandLst.hc: HandLst.hc
+   $(CPHC)
+
+$(SDH)\Muse.h: Muse.h
+   $(CPHC)
+
+$(SDH)\Errors.h: Errors.h
+   $(CPHC)
+
+$(SDH)\Thread.h: Thread.h
+   $(CPHC)
+
+DAC.hc: OutputBs.hc
+   touch $^@
+
+$(SDH)\DAC.hc: DAC.hc
+   $(CPHC)
+
+$(SDH)\Mix.hc: Mix.hc
+   $(CPHC)
+
+$(SDH)\TimeBuf.hc: TimeBuf.hc
+   $(CPHC)
+
+$(SDH)\EFXFiltr.hc: EFXFiltr.hc
+   $(CPHC)
+
+$(SDH)\Flags.h: Flags.h
+   $(CPHC)
+
+$(SDH)\MinMax.h: MinMax.h
+   $(CPHC)
+
+$(OUTDIR)\Mix.obj: Mix.asm
+   echo Compiling Mix.asm into $(OUTDIR)\Mix.obj
+   g:\bcos2\bin\tasm /oi /m2 /ml Mix.asm,$(OUTDIR)\Mix.obj
+
